@@ -1,1 +1,7 @@
-Adicionando arquivo
+-- Criar Banco
+CREATE DATABASE	banco;
+
+-- Remover um Banco
+DROP DATABASE teste;
+
+

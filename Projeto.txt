@@ -4,4 +4,5 @@ CREATE DATABASE	banco;
 -- Remover um Banco
 DROP DATABASE teste;
 
-
+-- Exibir o banco de dados
+SHOW DATABASES;

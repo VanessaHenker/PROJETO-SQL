@@ -13,3 +13,6 @@ SHOW DATABASES;
 CREATE TABLE minhatabela(
 	nome VARCHAR(100)
 );
+ 
+ -- REMOVER
+DROP TABLE minhatabela 

@@ -6,3 +6,10 @@ DROP DATABASE teste;
 
 -- Exibir o banco de dados
 SHOW DATABASES;
+
+-- CRIAR = CREATE
+-- DELETAR = DROP
+
+CREATE TABLE minhatabela(
+	nome VARCHAR(100)
+);

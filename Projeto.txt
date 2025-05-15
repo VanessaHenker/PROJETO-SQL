@@ -16,3 +16,12 @@ CREATE TABLE minhatabela(
  
  -- REMOVER
 DROP TABLE minhatabela 
+
+-- 	TIPOS DE DADOS
+-- TEXTO = VARCHAR(X)
+-- NUMERO = INT (X)alter
+-- DATAS = DATE
+
+CREATE TABLE pessoas (
+	nome  varchar (100)
+)

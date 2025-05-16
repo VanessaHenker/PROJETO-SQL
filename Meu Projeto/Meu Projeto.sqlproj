@@ -5,7 +5,7 @@
     <Name>Meu Projeto</Name>
     <ProjectGuid>{55668BC4-A8D1-48D5-A3DF-C7D9071ED7D3}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
-    <ModelCollation>1033, CI</ModelCollation>
+    <ModelCollation>1033 </ModelCollation>
   </PropertyGroup>
   <Target Name="BeforeBuild">
     <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />

@@ -25,3 +25,7 @@ DROP TABLE minhatabela
 CREATE TABLE pessoas (
 	nome  varchar (100)
 )
+
+CREATE TABLE pessoas (
+	nome  varchar (100)
+)

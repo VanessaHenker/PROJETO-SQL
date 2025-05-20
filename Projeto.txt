@@ -34,10 +34,19 @@ CREATE TABLE pessoas (
 ///////////
 Video aula: 19/05
 
+CREATE marcas (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  nome VARCHAR(100) NOT NULL UNIQUE,	
+	site VARCHAR(100), 	
+	telefone VARCHAR (15),
+
+
+)
+
 CRETAE TABLE produtos (
-	id INTEGER, 
-	nome VARCHAR(100), 
+	id INTEGER PRIMARY KEY AUTO_INCREMENT, 
+	nome VARCHAR(100) NOT NULL, 
 	preco REAL, 
-	estoque INTEGER, 
-	idMarca INTEGER
+	estoque INTEGER DEFAULT 0, 
+	idMarca INTEGER FOREING KEY REFERENCES
 )

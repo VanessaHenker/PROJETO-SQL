@@ -53,7 +53,7 @@ CRETAE TABLE produtos (
 ALTER TABLE produtos ADD COLUMN ID_MARCA INT NOT NULL;
 
 -- Modifica a coluna NOME da tabela produtos para permitir até 100 caracteres
-ALTER TABLE produtos MODIFY COLUMN NOME VARCHAR(100);
+ALTER TABLE produtos MODIFY COLUMN NOME VARCHAR(100);;
 
 -- Adiciona uma chave estrangeira ligando ID_MARCA da tabela produtos à coluna id da tabela marcas
 ALTER TABLE produtos ADD FOREIGN KEY (ID_MARCA) REFERENCES marcas(id);

@@ -35,9 +35,9 @@ CREATE TABLE pessoas (
 Video aula: 19/05
 
 CRETAE TABLE produtos (
-	id, 
-	nome, 
-	preco, 
-	estoque, 
-	idMarca
+	id INTEGER, 
+	nome VARCHAR(100), 
+	preco REAL, 
+	estoque INTEGER, 
+	idMarca INTEGER
 )

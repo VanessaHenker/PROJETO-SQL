@@ -46,5 +46,26 @@ CRETAE TABLE produtos (
 	nome VARCHAR(100) NOT NULL, 
 	preco REAL, 
 	estoque INTEGER DEFAULT 0, 
-	idMarca INTEGER FOREING KEY REFERENCES
-)
+	idMarca INTEGER FOREING KEY REFERENCES marcas(id)
+);25ms
+
+-- Adiciona a coluna ID_MARCA como obrigatória (não nula) na tabela produtos
+ALTER TABLE produtos ADD COLUMN ID_MARCA INT NOT NULL;
+
+-- Modifica a coluna NOME da tabela produtos para permitir até 100 caracteres
+ALTER TABLE produtos MODIFY COLUMN NOME VARCHAR(100);
+
+-- Adiciona uma chave estrangeira ligando ID_MARCA da tabela produtos à coluna id da tabela marcas
+ALTER TABLE produtos ADD FOREIGN KEY (ID_MARCA) REFERENCES marcas(id);
+
+-- Cria a tabela controle com uma chave primária e uma coluna de data
+CREATE TABLE controle (
+    id INTEGER PRIMARY KEY,
+    data_entrada DATE
+);
+
+-- Remove a tabela controle se ela já existir (para evitar erro ao recriar)
+DROP TABLE IF EXISTS controle;
+
+-- Cria um índice na coluna nome da tabela produtos para melhorar a performance de buscas
+CREATE INDEX idx_produtos_nome ON produtos(nome);

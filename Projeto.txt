@@ -29,3 +29,15 @@ CREATE TABLE pessoas (
 CREATE TABLE pessoas (
 	nome  varchar (100)
 )
+
+
+///////////
+Video aula: 19/05
+
+CRETAE TABLE produtos (
+	id, 
+	nome, 
+	preco, 
+	estoque, 
+	idMarca
+)

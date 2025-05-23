@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build">
   <Sdk Name="Microsoft.Build.Sql" Version="1.0.0" />
   <PropertyGroup>
-    <Name>Meu Projeto</Name>
+    <Name>Meu Proojeto</Name>
     <ProjectGuid>{55668BC4-A8D1-48D5-A3DF-C7D9071ED7D3}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
     <ModelCollation>1033 </ModelCollation>

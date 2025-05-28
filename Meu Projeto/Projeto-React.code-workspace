@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"path": "../../Projeto-React"
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"dataworkspace.excludedProjects": [
+			"Projeto-React/tetse/tetse.sqlproj",
+			"Projeto SQL/teste/teste.sqlproj",
+			"Projeto SQL/Meu Projeto/Meu Projeto.sqlproj"
+		],
+		"sqltools.connections": [
+			{
+				"mysqlOptions": {
+					"authProtocol": "default",
+					"enableSsl": "Disabled"
+				},
+				"previewLimit": 50,
+				"server": "localhost",
+				"port": 3306,
+				"driver": "MariaDB",
+				"name": "VanessaHenker",
+				"database": "mysql",
+				"username": "root",
+				"password": ""
+			}
+		]
+	}
+}

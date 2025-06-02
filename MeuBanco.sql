@@ -1,4 +1,4 @@
--- Active: 1748905997432@@localhost@3306@mysql
+-- Active: 1748905997432@@localhost@3306@banco
 
 -- Criar um banco
 --CREATE DATABASE banco;

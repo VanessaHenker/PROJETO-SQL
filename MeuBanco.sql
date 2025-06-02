@@ -31,4 +31,9 @@
 
 -- Alterar uma tabela
 
-ALTER TABLE pessoas ADD COLUMN profissao VARCHAR (255);
+--ALTER TABLE pessoas ADD COLUMN profissao VARCHAR (255);
+
+--SELECT * FROM pessoas; 
+
+INSERT INTO pessoas (nome, salario, dataNascimento, profissao)
+VALUES ("Vanessa", "3000", "25-03-2004", "Programadora")

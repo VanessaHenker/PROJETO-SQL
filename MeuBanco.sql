@@ -5,3 +5,12 @@
 
 -- Remover um banco
 --DROP DATABASE banco;
+
+--USE banco;
+
+-- criar = create
+-- deletar = drop
+
+CREATE TABLE minhaTabela (
+  nome VARCHAR (100)
+);

@@ -35,5 +35,5 @@
 
 --SELECT * FROM pessoas; 
 
-INSERT INTO pessoas (nome, salario, dataNascimento, profissao)
-VALUES ("Vanessa", "3000", "25-03-2004", "Programadora")
+/* INSERT INTO pessoas (nome, salario, dataNascimento, profissao)
+VALUES ("Vanessa", "3000", "25-03-2004", "Programadora") */

@@ -11,6 +11,21 @@
 -- criar = create
 -- deletar = drop
 
-CREATE TABLE minhaTabela (
+/* CREATE TABLE minhaTabela (
   nome VARCHAR (100)
-);
+); */ 
+
+-- Remover
+--DROP TABLE minhaTabela;
+
+-- Tipos de dados:
+-- texto = VARCHAR (100)
+-- numero = INT(x)
+-- datas = DATE
+
+/* CREATE TABLE pessoas (
+  nome VARCHAR (100),
+  salario int,
+  dataNascimento DATe 
+) */
+

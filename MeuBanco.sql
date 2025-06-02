@@ -29,3 +29,6 @@
   dataNascimento DATe 
 ) */
 
+-- Alterar uma tabela
+
+ALTER TABLE pessoas ADD COLUMN profissao VARCHAR (255);

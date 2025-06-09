@@ -1,3 +1,3 @@
 -- Active: 1749081423881@@localhost@3306@mysql
 
-SELECT * FROM pessoas
+UPDATE pessoas SET salario = 250  WHERE nome = "Vanessa"

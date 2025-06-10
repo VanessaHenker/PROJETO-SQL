@@ -1,5 +1,5 @@
 -- Active: 1749081423881@@localhost@3306@mysql
 
-SELECT pessoas.nome, enderecos.*
-FROM pessoas
-JOIN enderecos on pessoas.id = enderecos.pessoasID
+SELECT * FROM pessoas;
+
+SELECT SUM(salario) FROM pessoas

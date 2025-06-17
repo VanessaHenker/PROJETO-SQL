@@ -2,6 +2,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
  
 
 function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassoword] = useState('')
+
   return (
     <div className="container mt-5">
       <h2 className="mb-4">Login</h2>

@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+ 
 
 function Login() {
   return (
@@ -13,7 +14,7 @@ function Login() {
           <label htmlFor="senha" className="form-label">Senha</label>
           <input type="password" className="form-control" id="senha" placeholder="Digite sua senha" />
         </div>
-        <button type="submit" className="btn btn-primary">Entrar</button>
+        <button type="submit" className="btn btn-primary w-100">Entrar</button>
       </form>
     </div>
   );

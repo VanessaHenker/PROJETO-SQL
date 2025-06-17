@@ -1,0 +1,30 @@
+
+form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #ff6600; 
+}
+
+
+body {
+  background-color: #f2f2f2;
+}
+
+
+.btn-primary {
+  background-color: #ff6600;
+  border-color: #ff6600;
+}
+
+.btn-primary:hover {
+  background-color: #e65c00;
+  border-color: #e65c00;
+}

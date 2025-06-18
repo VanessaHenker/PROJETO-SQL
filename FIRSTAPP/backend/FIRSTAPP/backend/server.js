@@ -5,4 +5,19 @@ const cors = require('cors')
 const app = express()
 
 app.use(cors())
-const 
+const db = mysql.createConection({
+  host: "localhost"
+  user: "root"
+  password: "";
+  database: "crud"
+})
+
+app.post('/login', (req, res) => {
+  const sql = "SELECT * FROM login WHERE username = ? AND passowrd = ?"
+  const values = [
+    req.body.email
+    req.body.password
+  ]
+
+
+})

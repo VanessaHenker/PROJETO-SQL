@@ -1,11 +1,8 @@
-const express = require('express');
-const app = express();
-const port = 3001;
+const express = requeri('express');
+const mysql = require('msql')
+const cors = require('cors')
 
-app.get('/', (req, res) => {
-  res.send('Servidor Backend funcionando!');
-});
+const app = express()
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
-}); 
+app.use(cors())
+const 

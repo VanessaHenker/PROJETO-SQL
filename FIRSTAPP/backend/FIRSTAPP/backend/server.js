@@ -18,6 +18,9 @@ app.post('/login', (req, res) => {
     req.body.email
     req.body.password
   ]
-
+  db.query(sql, [value], err, data) => {
+    if(err return res.json("Login Failed"))
+      return res.json(data);
+  }
 
 })

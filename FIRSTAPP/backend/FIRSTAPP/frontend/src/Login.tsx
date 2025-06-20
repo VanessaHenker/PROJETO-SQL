@@ -10,7 +10,7 @@ function Login() {
     event.preventDefault();
     console.log('Email:', email);
     console.log('Senha:', password);
-    axios.post('')
+    axios.post('http://localhost:3000/login', {email, password})
   }
 
   return (

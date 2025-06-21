@@ -11,6 +11,8 @@ function Login() {
     console.log('Email:', email);
     console.log('Senha:', password);
     axios.post('http://localhost:3000/login', {email, password})
+    .then (res => console.log(res))
+    .catch (err => console.log(err))
   }
 
   return (

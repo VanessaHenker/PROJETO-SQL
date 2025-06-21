@@ -21,12 +21,12 @@ app.post('/login', (req, res) => {
   ];
 
   db.query(sql, values, (err, data) => { 
-    if (err) return res.json({ error: "Login Failed", details: err });
-
-    if (data.length > 0) {
-      return res.json({ success: true, data });
-    } else {
-      return res.json({ success: false, message: "Credenciais inválidas" });
+    if (err) return res.json({ error: "Error", details: err });
+    if(data.length > 0){
+      return res.json("Login Successfully")
+    }
+    else{
+      return res.json("No Record")
     }
   });
 });

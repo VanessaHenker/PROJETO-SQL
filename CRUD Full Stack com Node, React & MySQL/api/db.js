@@ -13,5 +13,5 @@ db.connect((err) => {
     return;
   }
   console.log("Conectado ao banco!");
-  db.end(); // encerra conexão após teste
+  db.end(); 
 });

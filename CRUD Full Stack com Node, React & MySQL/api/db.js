@@ -1,5 +1,7 @@
 import mysql from "mysql";
 
+import { db } from "../db.js";
+
 export const db = mysql.createConnection({
   host: "localhost",
   user: "root",

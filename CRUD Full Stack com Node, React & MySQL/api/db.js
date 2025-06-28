@@ -1,6 +1,6 @@
 import mysql from "mysql";
 
-const db = mysql.createConnection({
+export const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "willdev123",
@@ -13,5 +13,4 @@ db.connect((err) => {
     return;
   }
   console.log("Conectado ao banco!");
-  db.end(); 
 });

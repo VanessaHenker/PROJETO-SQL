@@ -1,24 +1,17 @@
 {
-  "name": "frontend",
+  "name": "api",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "astify": "^0.0.4",
-    "axios": "^1.10.0",
-    "cors": "^2.8.5",
     "express": "^5.1.0",
     "mysql": "^2.18.1",
-    "nodemon": "^3.1.10",
-    "react-icons": "^5.5.0",
-    "react-to": "^0.1.0",
-    "style-components": "^0.1.0"
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

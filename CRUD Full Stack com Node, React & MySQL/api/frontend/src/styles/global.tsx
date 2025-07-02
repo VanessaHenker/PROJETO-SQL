@@ -9,7 +9,11 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    width: 100%;
+    width: 100vh;
+    heigth: 100vh;
+    displey: flex;
+    justify-content: center;
+    backgroud-color: #f2f2f2
   }
 `;
 

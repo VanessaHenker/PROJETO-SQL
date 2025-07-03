@@ -24,7 +24,9 @@ function Form({ onEdit }: { onEdit?: (data: any) => void }) {
   return (
     <FormContainer>
       <InputArea>
-  
+        <label>Nome</label>
+        <input name = "nome" />
+        
       </InputArea>
     </FormContainer>
   );

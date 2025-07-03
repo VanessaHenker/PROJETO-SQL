@@ -18,6 +18,13 @@ const InputArea = styled.div`
   flex: 1;
 `;
 
+const Input = styled.input`
+  width: 120px;
+  padding: 0 10px;
+  border-radius: 1px solid #bbb;
+  height: 40px;
+`
+
 function Form({ onEdit }: { onEdit?: (data: any) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -26,10 +33,29 @@ function Form({ onEdit }: { onEdit?: (data: any) => void }) {
       <InputArea>
         <label>Nome</label>
         <input name = "nome" />
-        
       </InputArea>
+
+
+      <InputArea>
+        <label>E-mail</label>
+        <input name = "fone" type="email"/>
+      </InputArea>
+
+      <InputArea>
+        <label>Telefone</label>
+        <input name = "fone" />
+      </InputArea>
+
+      <InputArea>
+        <label>Data de nascimento</label>
+        <input name = "dataNascimento" type="date" />
+      </InputArea>
+      
     </FormContainer>
   );
+
+
+  
 }
 
 export default Form;

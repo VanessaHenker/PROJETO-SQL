@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "react-toastify": "^11.0.5",
+    "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "@types/react-toastify": "^4.0.2",
+    "@types/styled-components": "^5.1.34"
+  }
+}

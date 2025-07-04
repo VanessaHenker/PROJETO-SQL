@@ -51,6 +51,9 @@ function Form({ onEdit }: { onEdit?: (data: any) => void }) {
         <input name = "dataNascimento" type="date" />
       </InputArea>
       
+
+{/*       <Button type = "submit"> SALVAR </Button> */}
+
     </FormContainer>
   );
 

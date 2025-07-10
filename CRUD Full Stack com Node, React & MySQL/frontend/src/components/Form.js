@@ -12,6 +12,17 @@ const FormContainer = styled.form`
   border-radius: 5px;
 `;
 
+const InputArea = styled.div`
+  display: flex;
+  flex-direction: column
+
+`;
+
+const Form = ({onEdit}) => {
+  const ref= useRef();
+}
+
+
 function Form() {
   return (
     <FormContainer>

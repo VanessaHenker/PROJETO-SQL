@@ -1,5 +1,5 @@
-import React from 'react'
-import styled from "styled-components"
+import React, { useRef } from 'react';
+import styled from "styled-components";
 
 const FormContainer = styled.form`
   display: flex;
@@ -14,21 +14,20 @@ const FormContainer = styled.form`
 
 const InputArea = styled.div`
   display: flex;
-  flex-direction: column
-
+  flex-direction: column;
 `;
 
-const Form = ({onEdit}) => {
-  const ref= useRef();
-}
+const Form = ({ onEdit }) => {
+  const ref = useRef();
 
-
-function Form() {
   return (
-    <FormContainer>
-   
+    <FormContainer ref={ref}>
+      <InputArea>
+        <label htmlFor="nome">Nome</label>
+        <input id="nome" name="nome" type="text" />
+      </InputArea>
     </FormContainer>
   );
-}
+};
 
 export default Form;

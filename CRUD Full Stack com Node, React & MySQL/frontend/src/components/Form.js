@@ -52,6 +52,8 @@ const Form = ({ onEdit }) => {
         <label htmlFor="dataNascimento">Data de nascimento</label>
         <input id="dataNascimento" name="dataNascimento" type="date" />
       </InputArea>
+
+      <Button>Clique aqui</Button>
     </FormContainer>
   );
 };

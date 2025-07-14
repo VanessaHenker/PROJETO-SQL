@@ -7,23 +7,27 @@ import Form from "./components/Form";
 const Container = styled.div`
   width: 100%;
   max-width: 800px;
-  margin-top: 20px;
+  margin: 40px auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
 `;
 
-const Title = styled.h2 ``;
+const Title = styled.h2`
+  font-family: 'Poppins', sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+`;
 
 function App() {
   return (
     <>
       <Container>
         <Title>USUÁRIOS</Title>
-       <Form />
+        <Form />
       </Container>
-
       <ToastContainer autoClose={3000} position={toast.POSITION.BOTTOM_LEFT} />
       <GlobalStyle />
     </>

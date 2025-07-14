@@ -1,5 +1,5 @@
 import GlobalStyle from "./styles/global";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer, POSITION } from "react-toastify"; // ✅ Corrigido aqui
 import "react-toastify/dist/ReactToastify.css";
 import styled from "styled-components";
 import Form from "./components/Form";
@@ -28,7 +28,8 @@ function App() {
         <Title>USUÁRIOS</Title>
         <Form />
       </Container>
-      <ToastContainer autoClose={3000} position={toast.POSITION.BOTTOM_LEFT} />
+
+      <ToastContainer autoClose={3000} position={POSITION.BOTTOM_LEFT} />
       <GlobalStyle />
     </>
   );

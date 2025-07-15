@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { FaTrash, FaEdit } from "react-icons/fa";
-import { toast } from "react-toastify"; // Corrigido: estava "toastity"
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-
+// Estilos
 const Table = styled.table`
   width: 100%;
-  background-color: #fff; /* corrigido: 'backgroud-color' e uso de '=' */
+  background-color: #fff;
   padding: 20px;
   box-shadow: 0px 0px 5px #ccc;
   border-radius: 5px;
@@ -29,7 +30,26 @@ export const Th = styled.th`
   }
 `;
 
+export const Td = styled.td`
+  padding: 10px;
+  text-align: start;
+
+  @media (max-width: 500px) {
+    ${(props) => props.onlyweb && "display: none;"}
+  }
+`;
+
+
 function Grid() {
+  const [dados, setDados] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/dados") 
+      .then((res) => setDados(res.data))
+      .catch(() => toast.error("Erro ao carregar dados!"));
+  }, []);
+
   return (
     <Table>
       <Thead>
@@ -40,6 +60,19 @@ function Grid() {
           <Th onlyweb>Ações</Th>
         </Tr>
       </Thead>
+      <tbody>
+        {dados.map((item) => (
+          <Tr key={item.id}>
+            <Td>{item.id}</Td>
+            <Td>{item.nome}</Td>
+            <Td>{item.email}</Td>
+            <Td onlyweb>
+              <FaEdit style={{ marginRight: "10px", cursor: "pointer" }} />
+              <FaTrash style={{ color: "red", cursor: "pointer" }} />
+            </Td>
+          </Tr>
+        ))}
+      </tbody>
     </Table>
   );
 }

@@ -1,4 +1,4 @@
-import { db } from "../db.js"; 
+import { db } from "../db.js";
 
 // GET: Buscar todos os usuários
 export const getUsers = (_, res) => {
@@ -24,7 +24,35 @@ export const addUser = (req, res) => {
 
   db.query(q, [values], (err) => {
     if (err) return res.status(500).json(err);
+    return res.status(201).json("Usuário criado com sucesso");
+  });
+};
 
-    return res.status(200).json("Usuário criado com sucesso");
+// PUT: Atualizar usuário
+export const updateUser = (req, res) => {
+  const q =
+    "UPDATE usuarios SET nome = ?, email = ?, fone = ?, dataNascimento = ? WHERE id = ?";
+
+  const values = [
+    req.body.nome,
+    req.body.email,
+    req.body.fone,
+    req.body.dataNascimento,
+    req.params.id,
+  ];
+
+  db.query(q, values, (err) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json("Usuário atualizado com sucesso");
+  });
+};
+
+// DELETE: Remover usuário
+export const deleteUser = (req, res) => {
+  const q = "DELETE FROM usuarios WHERE id = ?";
+
+  db.query(q, [req.params.id], (err) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json("Usuário deletado com sucesso");
   });
 };

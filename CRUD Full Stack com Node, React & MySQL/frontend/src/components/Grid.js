@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,34 +25,27 @@ export const Th = styled.th`
   border-bottom: 1px inset #ccc;
   padding-bottom: 5px;
 
-  ${(props) =>
-    props.onlyweb &&
-    css`
-      @media (max-width: 500px) {
-        display: none;
-      }
-    `}
+  @media (max-width: 500px) {
+    ${(props) => props.onlyweb && "display: none;"}
+  }
 `;
 
 export const Td = styled.td`
   padding: 10px;
   text-align: start;
 
-  ${(props) =>
-    props.onlyweb &&
-    css`
-      @media (max-width: 500px) {
-        display: none;
-      }
-    `}
+  @media (max-width: 500px) {
+    ${(props) => props.onlyweb && "display: none;"}
+  }
 `;
+
 
 function Grid() {
   const [dados, setDados] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/dados")
+      .get("http://localhost:5000/dados") 
       .then((res) => setDados(res.data))
       .catch(() => toast.error("Erro ao carregar dados!"));
   }, []);

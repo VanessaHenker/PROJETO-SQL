@@ -41,29 +41,53 @@ const Button = styled.button`
 const Form = () => {
   const ref = useRef();
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(ref.current);
+    const data = Object.fromEntries(formData);
+
+    try {
+      const response = await fetch("http://localhost:3001/usuarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      alert(result);
+      ref.current.reset();
+    } catch (error) {
+      console.error("Erro ao enviar dados:", error);
+      alert("Erro ao criar usuário.");
+    }
+  };
+
   return (
-    <FormContainer ref={ref}>
+    <FormContainer ref={ref} onSubmit={handleSubmit}>
       <InputArea>
         <Label htmlFor="nome">Nome</Label>
-        <Input id="nome" name="nome" type="text" />
+        <Input id="nome" name="nome" type="text" required />
       </InputArea>
 
       <InputArea>
         <Label htmlFor="email">E-mail</Label>
-        <Input id="email" name="email" type="email" />
+        <Input id="email" name="email" type="email" required />
       </InputArea>
 
       <InputArea>
         <Label htmlFor="fone">Telefone</Label>
-        <Input id="fone" name="fone" type="tel" />
+        <Input id="fone" name="fone" type="tel" required />
       </InputArea>
 
       <InputArea>
         <Label htmlFor="dataNascimento">Data de nascimento</Label>
-        <Input id="dataNascimento" name="dataNascimento" type="date" />
+        <Input id="dataNascimento" name="dataNascimento" type="date" required />
       </InputArea>
 
-      <Button type="submit">Clique aqui</Button>
+      <Button type="submit">Enviar</Button>
     </FormContainer>
   );
 };

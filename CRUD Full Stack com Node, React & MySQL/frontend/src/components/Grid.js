@@ -1,88 +1,84 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
 import styled from "styled-components";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import axios from "axios";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-// Estilos
 const Table = styled.table`
   width: 100%;
   background-color: #fff;
   padding: 20px;
   box-shadow: 0px 0px 5px #ccc;
   border-radius: 5px;
-  margin: 20px auto;
-  word-break: break-word;
+  word-break: break-all;
 `;
 
 export const Thead = styled.thead``;
+
+export const Tbody = styled.tbody``;
 
 export const Tr = styled.tr``;
 
 export const Th = styled.th`
   text-align: start;
-  border-bottom: 1px inset #ccc;
+  border-bottom: inset;
   padding-bottom: 5px;
-
-  @media (max-width: 500px) {
-    ${(props) => props.onlyweb && "display: none;"}
-  }
 `;
 
 export const Td = styled.td`
-  padding: 10px;
+  padding-top: 15px;
   text-align: start;
-
-  @media (max-width: 500px) {
-    ${(props) => props.onlyweb && "display: none;"}
-  }
 `;
 
+const Grid = ({ users, setUsers, setOnEdit }) => {
+  const handleEdit = (item) => {
+    setOnEdit(item);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-function Grid() {
-  const [dados, setDados] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/dados")
-      .then((res) => setDados(res.data))
-      .catch(() => toast.error("Erro ao carregar dados!"));
-  }, []);
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8800/${id}`);
+      const updatedUsers = users.filter((user) => user.id !== id);
+      setUsers(updatedUsers);
+      toast.success("Usuário deletado com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao deletar usuário.");
+    }
+  };
 
   return (
     <Table>
       <Thead>
         <Tr>
-          <Th>ID</Th>
           <Th>Nome</Th>
           <Th>Email</Th>
-          <Th onlyweb>Ações</Th>
+          <Th>Fone</Th>
+          <Th>Data de Nascimento</Th>
+          <Th></Th>
         </Tr>
       </Thead>
-      <tbody>
-        {dados.map((item) => (
+      <Tbody>
+        {users.map((item) => (
           <Tr key={item.id}>
-            <Td>{item.id}</Td>
             <Td>{item.nome}</Td>
             <Td>{item.email}</Td>
-            <Td onlyweb>
+            <Td>{item.fone}</Td>
+            <Td>{item.data_nascimento}</Td>
+            <Td>
               <FaEdit
                 style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleEdit(item.id)} // se quiser editar
+                onClick={() => handleEdit(item)}
               />
-
               <FaTrash
                 style={{ color: "red", cursor: "pointer" }}
                 onClick={() => handleDelete(item.id)}
               />
-
             </Td>
           </Tr>
         ))}
-      </tbody>
+      </Tbody>
     </Table>
   );
-}
+};
 
 export default Grid;

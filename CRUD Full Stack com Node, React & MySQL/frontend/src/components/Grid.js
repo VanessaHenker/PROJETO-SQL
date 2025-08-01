@@ -45,7 +45,7 @@ function Grid() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/dados") 
+      .get("http://localhost:5000/dados")
       .then((res) => setDados(res.data))
       .catch(() => toast.error("Erro ao carregar dados!"));
   }, []);
@@ -67,8 +67,16 @@ function Grid() {
             <Td>{item.nome}</Td>
             <Td>{item.email}</Td>
             <Td onlyweb>
-              <FaEdit style={{ marginRight: "10px", cursor: "pointer" }} />
-              <FaTrash style={{ color: "red", cursor: "pointer" }} />
+              <FaEdit
+                style={{ marginRight: "10px", cursor: "pointer" }}
+                onClick={() => handleEdit(item.id)} // se quiser editar
+              />
+
+              <FaTrash
+                style={{ color: "red", cursor: "pointer" }}
+                onClick={() => handleDelete(item.id)}
+              />
+
             </Td>
           </Tr>
         ))}

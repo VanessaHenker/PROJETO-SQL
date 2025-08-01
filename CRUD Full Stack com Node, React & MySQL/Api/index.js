@@ -1,18 +1,13 @@
 import express from "express";
 import cors from "cors";
+import userRoutes from "./routes/user.js";
 
 const app = express();
 
-
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
+app.use("/usuarios", userRoutes);
 
-
-app.get("/", (req, res) => {
-  res.send("Servidor backend rodando com sucesso!");
-});
-
-
-app.listen(8800, () => {
-  console.log("Servidor backend está rodando em http://localhost:8800");
+app.listen(3001, () => {
+  console.log("Servidor backend rodando na porta 3001");
 });

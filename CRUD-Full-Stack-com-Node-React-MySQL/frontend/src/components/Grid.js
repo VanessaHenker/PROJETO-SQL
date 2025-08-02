@@ -13,9 +13,7 @@ const Table = styled.table`
 `;
 
 export const Thead = styled.thead``;
-
 export const Tbody = styled.tbody``;
-
 export const Tr = styled.tr``;
 
 export const Th = styled.th`
@@ -36,8 +34,10 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Deseja realmente deletar este usuário?")) return;
+
     try {
-      await axios.delete(`http://localhost:8800/${id}`);
+      await axios.delete(`http://localhost:8800/usuarios/${id}`);
       const updatedUsers = users.filter((user) => user.id !== id);
       setUsers(updatedUsers);
       toast.success("Usuário deletado com sucesso!");
@@ -63,15 +63,17 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
             <Td>{item.nome}</Td>
             <Td>{item.email}</Td>
             <Td>{item.fone}</Td>
-            <Td>{item.data_nascimento}</Td>
+            <Td>{new Date(item.data_nascimento).toLocaleDateString()}</Td>
             <Td>
               <FaEdit
                 style={{ marginRight: "10px", cursor: "pointer" }}
                 onClick={() => handleEdit(item)}
+                title="Editar usuário"
               />
               <FaTrash
                 style={{ color: "red", cursor: "pointer" }}
                 onClick={() => handleDelete(item.id)}
+                title="Deletar usuário"
               />
             </Td>
           </Tr>

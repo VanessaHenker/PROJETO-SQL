@@ -13,13 +13,13 @@ export const getUsers = (_, res) => {
 // POST: Adicionar novo usuário
 export const addUser = (req, res) => {
   const q =
-    "INSERT INTO usuarios (`nome`, `email`, `fone`, `dataNascimento`) VALUES (?)";
+    "INSERT INTO usuarios (`nome`, `email`, `fone`, `data_nascimento`) VALUES (?)";
 
   const values = [
     req.body.nome,
     req.body.email,
     req.body.fone,
-    req.body.dataNascimento,
+    req.body.data_nascimento,
   ];
 
   db.query(q, [values], (err) => {
@@ -31,13 +31,13 @@ export const addUser = (req, res) => {
 // PUT: Atualizar usuário
 export const updateUser = (req, res) => {
   const q =
-    "UPDATE usuarios SET nome = ?, email = ?, fone = ?, dataNascimento = ? WHERE id = ?";
+    "UPDATE usuarios SET nome = ?, email = ?, fone = ?, data_nascimento = ? WHERE id = ?";
 
   const values = [
     req.body.nome,
     req.body.email,
     req.body.fone,
-    req.body.dataNascimento,
+    req.body.data_nascimento,
     req.params.id,
   ];
 

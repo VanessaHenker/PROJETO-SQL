@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
+import { toast } from "react-toastify";
 
 const FormContainer = styled.form`
   display: flex;
@@ -38,8 +39,23 @@ const Button = styled.button`
   align-self: flex-end;
 `;
 
-const Form = () => {
+const Form = ({ getUsers, onEdit, setOnEdit }) => {
   const ref = useRef();
+
+  useEffect(() => {
+    if (onEdit) {
+      const form = ref.current;
+      form.nome.value = onEdit.nome || "";
+      form.email.value = onEdit.email || "";
+      form.fone.value = onEdit.fone || "";
+      // Ajuste para nome do campo que vem do backend
+      form.dataNascimento.value = onEdit.data_nascimento
+        ? onEdit.data_nascimento.split("T")[0] // Formata ISO date para yyyy-mm-dd
+        : "";
+    } else {
+      ref.current.reset();
+    }
+  }, [onEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,20 +64,30 @@ const Form = () => {
     const data = Object.fromEntries(formData);
 
     try {
-      const response = await fetch("http://localhost:3001/usuarios", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-      alert(result);
+      if (onEdit) {
+        // PUT para editar usuário
+        await fetch(`http://localhost:8800/usuarios/${onEdit.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        toast.success("Usuário atualizado com sucesso!");
+      } else {
+        // POST para criar novo usuário
+        await fetch("http://localhost:8800/usuarios", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        toast.success("Usuário criado com sucesso!");
+      }
       ref.current.reset();
+      setOnEdit(null);
+      getUsers();
     } catch (error) {
-      console.error("Erro ao enviar dados:", error);
-      alert("Erro ao criar usuário.");
+      toast.error("Erro ao salvar usuário.");
     }
   };
 
@@ -84,10 +110,10 @@ const Form = () => {
 
       <InputArea>
         <Label htmlFor="dataNascimento">Data de nascimento</Label>
-        <Input id="dataNascimento" name="dataNascimento" type="date" required />
+        <Input id="dataNascimento" name="data_nascimento" type="date" required />
       </InputArea>
 
-      <Button type="submit">Enviar</Button>
+      <Button type="submit">{onEdit ? "Atualizar" : "Enviar"}</Button>
     </FormContainer>
   );
 };

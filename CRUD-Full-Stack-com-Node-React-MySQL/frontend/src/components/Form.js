@@ -48,9 +48,8 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
       form.nome.value = onEdit.nome || "";
       form.email.value = onEdit.email || "";
       form.fone.value = onEdit.fone || "";
-      // Ajuste para nome do campo que vem do backend
       form.dataNascimento.value = onEdit.data_nascimento
-        ? onEdit.data_nascimento.split("T")[0] // Formata ISO date para yyyy-mm-dd
+        ? onEdit.data_nascimento.split("T")[0]
         : "";
     } else {
       ref.current.reset();
@@ -65,8 +64,7 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
 
     try {
       if (onEdit) {
-        // PUT para editar usuário
-        await fetch(`http://localhost:8800/usuarios/${onEdit.id}`, {
+        await fetch(`http://localhost:3001/usuarios/${onEdit.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -75,8 +73,7 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
         });
         toast.success("Usuário atualizado com sucesso!");
       } else {
-        // POST para criar novo usuário
-        await fetch("http://localhost:8800/usuarios", {
+        await fetch("http://localhost:3001/usuarios", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),

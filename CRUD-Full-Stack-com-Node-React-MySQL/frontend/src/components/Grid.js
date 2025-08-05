@@ -37,7 +37,7 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
     if (!window.confirm("Deseja realmente deletar este usuário?")) return;
 
     try {
-      await axios.delete(`http://localhost:8800/usuarios/${id}`);
+      await axios.delete(`http://localhost:3001/usuarios/${id}`);
       const updatedUsers = users.filter((user) => user.id !== id);
       setUsers(updatedUsers);
       toast.success("Usuário deletado com sucesso!");

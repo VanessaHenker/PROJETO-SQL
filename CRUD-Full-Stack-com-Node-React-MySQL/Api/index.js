@@ -11,7 +11,6 @@ app.get("/", (req, res) => {
   res.send("API funcionando!");
 });
 
-
 app.use("/usuarios", userRoutes);
 
 app.listen(3001, () => {

@@ -34,7 +34,7 @@ function App() {
       const res = await axios.get("http://localhost:3001/usuarios");
       setUsers(res.data.sort((a, b) => (a.nome > b.nome ? 1 : -1)));
     } catch (error) {
-      toast.error(error.message || "Erro ao buscar usuários");
+      toast.error(error.response?.data?.error || error.message || "Erro ao buscar usuários");
     }
   };
 

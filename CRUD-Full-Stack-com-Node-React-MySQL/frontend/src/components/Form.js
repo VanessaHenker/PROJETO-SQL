@@ -64,27 +64,29 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
 
     try {
       if (onEdit) {
-        await fetch(`http://localhost:3001/usuarios/${onEdit.id}`, {
+        const res = await fetch(`http://localhost:3001/usuarios/${onEdit.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
         });
+        if (!res.ok) throw new Error("Erro ao atualizar usuário");
         toast.success("Usuário atualizado com sucesso!");
       } else {
-        await fetch("http://localhost:3001/usuarios", {
+        const res = await fetch("http://localhost:3001/usuarios", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
+        if (!res.ok) throw new Error("Erro ao criar usuário");
         toast.success("Usuário criado com sucesso!");
       }
       ref.current.reset();
       setOnEdit(null);
       getUsers();
     } catch (error) {
-      toast.error("Erro ao salvar usuário.");
+      toast.error(error.message || "Erro ao salvar usuário.");
     }
   };
 

@@ -9,19 +9,20 @@ export const getUsers = (_, res) => {
       console.error("Erro ao buscar usuários:", err);
       return res.status(500).json({ error: "Erro ao buscar usuários" });
     }
+
     return res.status(200).json(data);
   });
 };
 
 // POST: Adicionar novo usuário
 export const addUser = (req, res) => {
-  const q = "INSERT INTO usuarios (`nome`, `email`, `fone`, `data_nascimento`) VALUES (?)";
+  const q = "INSERT INTO usuarios (`nome`, `email`, `fone`, `dataNascimento`) VALUES (?)";
 
   const values = [
     req.body.nome,
     req.body.email,
     req.body.fone,
-    req.body.data_nascimento,
+    req.body.dataNascimento,
   ];
 
   db.query(q, [values], (err, result) => {
@@ -29,19 +30,20 @@ export const addUser = (req, res) => {
       console.error("Erro ao criar usuário:", err);
       return res.status(500).json({ error: "Erro ao criar usuário" });
     }
+
     return res.status(201).json({ message: "Usuário criado com sucesso", id: result.insertId });
   });
 };
 
 // PUT: Atualizar usuário
 export const updateUser = (req, res) => {
-  const q = "UPDATE usuarios SET nome = ?, email = ?, fone = ?, data_nascimento = ? WHERE id = ?";
+  const q = "UPDATE usuarios SET nome = ?, email = ?, fone = ?, dataNascimento = ? WHERE id = ?";
 
   const values = [
     req.body.nome,
     req.body.email,
     req.body.fone,
-    req.body.data_nascimento,
+    req.body.dataNascimento,
     req.params.id,
   ];
 
@@ -50,9 +52,11 @@ export const updateUser = (req, res) => {
       console.error("Erro ao atualizar usuário:", err);
       return res.status(500).json({ error: "Erro ao atualizar usuário" });
     }
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuário não encontrado" });
     }
+
     return res.status(200).json({ message: "Usuário atualizado com sucesso" });
   });
 };
@@ -66,9 +70,11 @@ export const deleteUser = (req, res) => {
       console.error("Erro ao deletar usuário:", err);
       return res.status(500).json({ error: "Erro ao deletar usuário" });
     }
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuário não encontrado" });
     }
+
     return res.status(200).json({ message: "Usuário deletado com sucesso" });
   });
 };

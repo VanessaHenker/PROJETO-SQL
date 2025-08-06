@@ -50,8 +50,8 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
       form.nome.value = onEdit.nome || "";
       form.email.value = onEdit.email || "";
       form.fone.value = onEdit.fone || "";
-      form.data_nascimento.value = onEdit.data_nascimento
-        ? onEdit.data_nascimento.split("T")[0]
+      form.dataNascimento.value = onEdit.dataNascimento
+        ? onEdit.dataNascimento.split("T")[0]
         : "";
     } else {
       ref.current.reset();
@@ -64,7 +64,7 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
     const formData = new FormData(ref.current);
     const data = Object.fromEntries(formData.entries());
 
-    if (!data.nome || !data.email || !data.fone || !data.data_nascimento) {
+    if (!data.nome || !data.email || !data.fone || !data.dataNascimento) {
       return toast.warn("Preencha todos os campos!");
     }
 
@@ -111,8 +111,8 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
       </InputArea>
 
       <InputArea>
-        <Label htmlFor="data_nascimento">Data de nascimento</Label>
-        <Input id="data_nascimento" name="data_nascimento" type="date" required />
+        <Label htmlFor="dataNascimento">Data de nascimento</Label>
+        <Input id="dataNascimento" name="dataNascimento" type="date" required />
       </InputArea>
 
       <Button type="submit">{onEdit ? "Atualizar" : "Enviar"}</Button>

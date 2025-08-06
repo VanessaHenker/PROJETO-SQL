@@ -3,7 +3,6 @@ import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-// Estilos com styled-components
 const Table = styled.table`
   width: 100%;
   background-color: #fff;
@@ -29,13 +28,11 @@ export const Td = styled.td`
 `;
 
 const Grid = ({ users, setUsers, setOnEdit }) => {
-  // Função para editar usuário
   const handleEdit = (item) => {
     setOnEdit(item);
-    window.scrollTo({ top: 0, behavior: "smooth" }); // Rolagem suave até o topo
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Função para deletar usuário
   const handleDelete = async (id) => {
     if (!window.confirm("Deseja realmente deletar este usuário?")) return;
 
@@ -66,14 +63,11 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
             <Td>{item.nome}</Td>
             <Td>{item.email}</Td>
             <Td>{item.fone}</Td>
-
-            {/* Corrigido: uso de dataNascimento e formatação */}
             <Td>
               {item.dataNascimento
-                ? new Date(item.dataNascimento + "T00:00:00").toLocaleDateString("pt-BR")
+                ? new Date(item.dataNascimento).toLocaleDateString("pt-BR")
                 : "Data inválida"}
             </Td>
-
             <Td>
               <FaEdit
                 style={{ marginRight: "10px", cursor: "pointer" }}

@@ -20,12 +20,14 @@ const InputArea = styled.div`
 
 const Label = styled.label`
   margin-bottom: 5px;
+  font-weight: bold;
 `;
 
 const Input = styled.input`
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  outline-color: #2c73d2;
 `;
 
 const Button = styled.button`
@@ -48,7 +50,7 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
       form.nome.value = onEdit.nome || "";
       form.email.value = onEdit.email || "";
       form.fone.value = onEdit.fone || "";
-      form.dataNascimento.value = onEdit.data_nascimento
+      form.data_nascimento.value = onEdit.data_nascimento
         ? onEdit.data_nascimento.split("T")[0]
         : "";
     } else {
@@ -60,28 +62,29 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
     e.preventDefault();
 
     const formData = new FormData(ref.current);
-    const data = Object.fromEntries(formData);
+    const data = Object.fromEntries(formData.entries());
+
+    if (!data.nome || !data.email || !data.fone || !data.data_nascimento) {
+      return toast.warn("Preencha todos os campos!");
+    }
 
     try {
-      if (onEdit) {
-        const res = await fetch(`http://localhost:3001/usuarios/${onEdit.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-        if (!res.ok) throw new Error("Erro ao atualizar usuário");
-        toast.success("Usuário atualizado com sucesso!");
-      } else {
-        const res = await fetch("http://localhost:3001/usuarios", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        if (!res.ok) throw new Error("Erro ao criar usuário");
-        toast.success("Usuário criado com sucesso!");
-      }
+      const url = onEdit
+        ? `http://localhost:3001/usuarios/${onEdit.id}`
+        : "http://localhost:3001/usuarios";
+
+      const method = onEdit ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Erro ao salvar usuário");
+
+      toast.success(onEdit ? "Usuário atualizado com sucesso!" : "Usuário criado com sucesso!");
+
       ref.current.reset();
       setOnEdit(null);
       getUsers();
@@ -108,8 +111,8 @@ const Form = ({ getUsers, onEdit, setOnEdit }) => {
       </InputArea>
 
       <InputArea>
-        <Label htmlFor="dataNascimento">Data de nascimento</Label>
-        <Input id="dataNascimento" name="data_nascimento" type="date" required />
+        <Label htmlFor="data_nascimento">Data de nascimento</Label>
+        <Input id="data_nascimento" name="data_nascimento" type="date" required />
       </InputArea>
 
       <Button type="submit">{onEdit ? "Atualizar" : "Enviar"}</Button>

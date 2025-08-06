@@ -3,13 +3,14 @@ import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 
+// Estilos com styled-components
 const Table = styled.table`
   width: 100%;
   background-color: #fff;
   padding: 20px;
   box-shadow: 0px 0px 5px #ccc;
   border-radius: 5px;
-  word-break: break-all;
+  word-break: break-word;
 `;
 
 export const Thead = styled.thead``;
@@ -28,11 +29,13 @@ export const Td = styled.td`
 `;
 
 const Grid = ({ users, setUsers, setOnEdit }) => {
+  // Função para editar usuário
   const handleEdit = (item) => {
     setOnEdit(item);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Rolagem suave até o topo
   };
 
+  // Função para deletar usuário
   const handleDelete = async (id) => {
     if (!window.confirm("Deseja realmente deletar este usuário?")) return;
 
@@ -54,7 +57,7 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
           <Th>Email</Th>
           <Th>Fone</Th>
           <Th>Data de Nascimento</Th>
-          <Th></Th>
+          <Th>Ações</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -63,7 +66,14 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
             <Td>{item.nome}</Td>
             <Td>{item.email}</Td>
             <Td>{item.fone}</Td>
-            <Td>{new Date(item.data_nascimento).toLocaleDateString()}</Td>
+
+            {/* Corrigido: uso de dataNascimento e formatação */}
+            <Td>
+              {item.dataNascimento
+                ? new Date(item.dataNascimento + "T00:00:00").toLocaleDateString("pt-BR")
+                : "Data inválida"}
+            </Td>
+
             <Td>
               <FaEdit
                 style={{ marginRight: "10px", cursor: "pointer" }}

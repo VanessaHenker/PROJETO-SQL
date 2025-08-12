@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { db } from "../conexaoSql";
+import { conexaoSql } from "../conexaoSql";
 
 export const getUsers = (req: Request, res: Response): void => {
   const q = "SELECT * FROM produtos";
 
-  db.query(q, (err, data) => {
+  conexaoSql.query(q, (err, data) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }

@@ -1,8 +1,9 @@
 import "./global.css";
 
-function App(): JSX.Element {
+function App() {
   return (
     <div className="App">
+      
     </div>
   );
 }

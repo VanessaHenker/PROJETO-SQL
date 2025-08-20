@@ -1,5 +1,5 @@
 import React from "react";
-import { FormContainer, InputArea, Label, Input, Button } from "./form.css"; 
+import { FormContainer, InputArea, Label, Input, Button } from "../styles/FormStyles";
 
 const Form: React.FC = () => {
   return (
@@ -16,17 +16,17 @@ const Form: React.FC = () => {
 
       <InputArea>
         <Label htmlFor="preco">Preço</Label>
-        <Input id="preco" name="preco" type="number" />
+        <Input id="preco" name="preco" type="number" step="0.01" />
       </InputArea>
 
       <InputArea>
-        <Label htmlFor="quantidade">Quantidade</Label>
-        <Input id="quantidade" name="quantidade" type="number" />
+        <Label htmlFor="quantidade_estoque">Quantidade em Estoque</Label>
+        <Input id="quantidade_estoque" name="quantidade_estoque" type="number" />
       </InputArea>
 
       <InputArea>
-        <Label htmlFor="cadastro">Data de cadastro</Label>
-        <Input id="cadastro" name="cadastro" type="date" />
+        <Label htmlFor="data_cadastro">Data de Cadastro</Label>
+        <Input id="data_cadastro" name="data_cadastro" type="date" />
       </InputArea>
 
       <Button type="submit">Salvar</Button>

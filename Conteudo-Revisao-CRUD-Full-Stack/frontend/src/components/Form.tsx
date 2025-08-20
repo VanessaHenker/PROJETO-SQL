@@ -1,36 +1,36 @@
 import React from "react";
-import { FormContainer, InputArea, Label, Input, Button } from "../styles/FormStyles";
+import "../styles/form.css";
 
 const Form: React.FC = () => {
   return (
-    <FormContainer>
-      <InputArea>
-        <Label htmlFor="nome">Nome</Label>
-        <Input id="nome" name="nome" type="text" />
-      </InputArea>
+    <form className="form">
+      <div className="input-area">
+        <label htmlFor="nome">Nome</label>
+        <input id="nome" name="nome" type="text" />
+      </div>
 
-      <InputArea>
-        <Label htmlFor="descricao">Descrição</Label>
-        <Input id="descricao" name="descricao" type="text" />
-      </InputArea>
+      <div className="input-area">
+        <label htmlFor="descricao">Descrição</label>
+        <input id="descricao" name="descricao" type="text" />
+      </div>
 
-      <InputArea>
-        <Label htmlFor="preco">Preço</Label>
-        <Input id="preco" name="preco" type="number" step="0.01" />
-      </InputArea>
+      <div className="input-area">
+        <label htmlFor="preco">Preço</label>
+        <input id="preco" name="preco" type="number" step="0.01" />
+      </div>
 
-      <InputArea>
-        <Label htmlFor="quantidade_estoque">Quantidade em Estoque</Label>
-        <Input id="quantidade_estoque" name="quantidade_estoque" type="number" />
-      </InputArea>
+      <div className="input-area">
+        <label htmlFor="quantidade_estoque">Quantidade em Estoque</label>
+        <input id="quantidade_estoque" name="quantidade_estoque" type="number" />
+      </div>
 
-      <InputArea>
-        <Label htmlFor="data_cadastro">Data de Cadastro</Label>
-        <Input id="data_cadastro" name="data_cadastro" type="date" />
-      </InputArea>
+      <div className="input-area">
+        <label htmlFor="data_cadastro">Data de Cadastro</label>
+        <input id="data_cadastro" name="data_cadastro" type="date" />
+      </div>
 
-      <Button type="submit">Salvar</Button>
-    </FormContainer>
+      <button type="submit">Salvar</button>
+    </form>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import Form from "./components/Form";
+import Form from "./components/Form"; // caminho correto
 import "./styles/form.css";
 
 const App: React.FC = () => {

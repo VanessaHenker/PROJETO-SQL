@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/form.css";
 
-const Form: React.FC = () => {
+const Form = () => {
   return (
     <form className="form">
       <div className="input-area">

@@ -1,9 +1,12 @@
-function App() {
-  return (
-    <>
-    <h2>ola</h2>
-    </>
-  )
-}
+import Form from "./components/Form";
 
-export default App
+const App = () => {
+  return (
+    <div className="App">
+      <h1>Cadastro de Produtos</h1>
+      <Form />
+    </div>
+  );
+};
+
+export default App;

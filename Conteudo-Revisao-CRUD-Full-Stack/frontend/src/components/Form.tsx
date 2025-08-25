@@ -28,6 +28,11 @@ const Form = () => {
         <input id="data_cadastro" name="data_cadastro" type="date" />
       </div>
 
+      <div className={styles.inputArea}>
+        <label htmlFor="imagem">Imagem do Produto</label>
+        <input id="imagem" name="imagem" type="file" accept="image/*" />
+      </div>
+
       <button type="submit" className={styles.button}>Salvar</button>
     </form>
   );

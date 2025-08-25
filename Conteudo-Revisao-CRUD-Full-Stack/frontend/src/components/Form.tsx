@@ -1,13 +1,18 @@
+import { useState } from "react";
 import styles from "../styles/form.module.css";
 
 const Form = () => {
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   return (
     <form className={styles.form}>
-      <div className={styles.inputArea}>
-        <label htmlFor="imagem">Imagem do Produto</label>
-        <input id="imagem" name="imagem" type="file" accept="image/*" />
-      </div>
-
       <div className={styles.inputArea}>
         <label htmlFor="nome">Nome</label>
         <input id="nome" name="nome" type="text" />
@@ -33,7 +38,26 @@ const Form = () => {
         <input id="data_cadastro" name="data_cadastro" type="date" />
       </div>
 
-      <button type="submit" className={styles.button}>Salvar</button>
+      <div className={styles.inputArea}>
+        <label htmlFor="imagem">Imagem do Produto</label>
+        <input
+          id="imagem"
+          name="imagem"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+      </div>
+
+      {preview && (
+        <div className={styles.preview}>
+          <img src={preview} alt="Preview" />
+        </div>
+      )}
+
+      <button type="submit" className={styles.button}>
+        Salvar
+      </button>
     </form>
   );
 };

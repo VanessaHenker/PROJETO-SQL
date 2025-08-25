@@ -1,72 +1,68 @@
-form {
+.form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 450px;
   margin: 2rem auto;
-  padding: 2rem;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.input-area {
+.inputArea {
   display: flex;
   flex-direction: column;
+  gap: 0.4rem;
 }
 
 label {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #222;
 }
 
 input {
-  padding: 0.75rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus {
   border-color: #ff7a00;
-  box-shadow: 0 0 5px rgba(255, 122, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.2);
   outline: none;
 }
 
-button {
-  padding: 0.85rem 1.5rem;
+.button {
+  margin-top: 1rem;
+  padding: 0.7rem 1.2rem;
   background-color: #ff7a00;
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color 0.25s, transform 0.15s;
 }
 
-button:hover {
-  background-color: #e86c00;
-  transform: translateY(-2px);
+.button:hover {
+  background-color: #e76d00;
+  transform: translateY(-1px);
 }
 
-button:active {
+.button:active {
   transform: translateY(1px);
 }
 
 /* Responsivo */
 @media (max-width: 600px) {
-  form {
-    padding: 1.5rem;
-    gap: 1rem;
+  .form {
+    padding: 0 1rem;
   }
 
-  input, button {
-    font-size: 0.95rem;
-    padding: 0.65rem 1rem;
+  input, .button {
+    font-size: 0.9rem;
+    padding: 0.6rem;
   }
 }

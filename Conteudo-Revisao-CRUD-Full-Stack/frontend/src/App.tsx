@@ -1,11 +1,11 @@
-import "./app.module.css";
+import styles from "./app.module.css";
 import Form from "./components/Form";
 
 const App = () => {
   return (
-    <div className="App">
+    <div className={styles.App}>
       <h1>Cadastro de Produtos</h1>
-      <div className="card">
+      <div>
         <Form />
       </div>
     </div>

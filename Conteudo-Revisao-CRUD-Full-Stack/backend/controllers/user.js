@@ -1,7 +1,6 @@
-import { Request, Response } from "express";
-import { conexaoSql } from "../conexaoSql.js";
+const { conexaoSql } = require("../conexaoSql");
 
-export const getUsers = (req: Request, res: Response): void => {
+const getUsers = (req, res) => {
   const q = "SELECT * FROM produtos";
 
   conexaoSql.query(q, (err, data) => {
@@ -11,3 +10,5 @@ export const getUsers = (req: Request, res: Response): void => {
     return res.status(200).json(data);
   });
 };
+
+module.exports = { getUsers };

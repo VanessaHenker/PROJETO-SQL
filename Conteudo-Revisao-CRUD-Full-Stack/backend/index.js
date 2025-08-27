@@ -1,15 +1,18 @@
-const express = require("express");
-const cors = require("cors");
-const userRoutes = require("./routes/users");
+import express from "express";
+import cors from "cors";
+import userRoutes from "./routes/users.js"; // note o .js
 
 const app = express();
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-app.use("/api/users", userRoutes);
+app.get("/", (req, res) => {
+  res.send("API funcionando!");
+});
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+app.use("/usuarios", userRoutes);
+
+app.listen(3001, () => {
+  console.log("Servidor backend rodando na porta 3001");
 });

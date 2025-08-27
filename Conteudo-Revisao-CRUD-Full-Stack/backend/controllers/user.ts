@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { conexaoSql } from "../conexaoSql";
+import { conexaoSql } from "../conexaoSql.js";
 
 export const getUsers = (req: Request, res: Response): void => {
   const q = "SELECT * FROM produtos";

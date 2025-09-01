@@ -1,14 +1,8 @@
 import express from "express";
-import userRoutes from "./routes/users"; 
-import cors from "cors";
+import {getUsers} from "../controllers/user.ts"
 
-const app = express();
+const router = express.Router();
 
-app.use(express.json());
-app.use(cors());
+router.get("/", getUsers);
 
-app.use("/usuarios", userRoutes);
-
-app.listen(8800, () => {
-  console.log("Servidor rodando na porta 8800 🚀");
-});
+export default router;

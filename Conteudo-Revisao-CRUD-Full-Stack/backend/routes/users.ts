@@ -1,7 +1,7 @@
-import express from "express";
-import {getUsers} from "../controllers/user.ts"
+import { Router, Request, Response } from "express";
+import {getUsers} from "../conexaoSQL"; 
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", getUsers);
 

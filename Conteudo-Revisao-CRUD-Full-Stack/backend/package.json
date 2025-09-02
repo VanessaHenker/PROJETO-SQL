@@ -4,9 +4,9 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-  "dev": "ts-node-dev --respawn --transpile-only --loader ts-node/esm index.ts",
-  "build": "tsc",
-  "start": "node dist/index.js"
+    "dev": "ts-node-dev --respawn --transpile-only --loader ts-node/esm index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,12 +15,13 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "mysql2": "^3.14.4"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "ts-node-dev": "^2.0.0",
+    "@types/express": "^4.17.21",
     "@types/node": "^20.0.0",
-    "@types/express": "^4.17.21"
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
   }
 }

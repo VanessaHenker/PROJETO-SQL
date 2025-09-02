@@ -1,4 +1,4 @@
-import {db} from "../conexaoSQL.ts"
+import {db} from "../conexaoSQL.js"
 
 export const getUsers = (_, res) => {
   const q = "SELECT * FROM produtos"

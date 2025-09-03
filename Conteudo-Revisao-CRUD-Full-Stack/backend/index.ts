@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import userRoutes from "./routes/users"; // sem .js
+import userRoutes from "./routes/users"; 
 
 const app = express();
 

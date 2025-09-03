@@ -1,4 +1,5 @@
 import mysql from "mysql";
+import { Request, Response } from "express";
 
 // Conexão com o banco
 export const db = mysql.createConnection({
@@ -9,7 +10,7 @@ export const db = mysql.createConnection({
 });
 
 // Função para pegar usuários
-export const getUsers = (req, res) => {
+export const getUsers = (req: Request, res: Response) => {
   const q = "SELECT * FROM produtos";
 
   db.query(q, (err, data) => {

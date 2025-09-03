@@ -1,14 +1,16 @@
-import mysql from "mysql";
+import mysql from "mysql2";
 import { Request, Response } from "express";
 
+// Conexão com o banco
 export const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "MeuBanco2"
+  database: "MeuBanco2",
 });
 
-export const getUsers = (req: Request, res: Response) => {
+// Função para pegar usuários
+export const getUsers = (_req: Request, res: Response) => {
   const q = "SELECT * FROM produtos";
 
   db.query(q, (err, data) => {

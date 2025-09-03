@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUsers } from "../conexaoSQL"; 
+import { getUsers } from "../conexaoSQL.js";
 
 const router = Router();
 

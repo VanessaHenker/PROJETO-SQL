@@ -1,24 +1,28 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "outDir": "./dist",
-    "rootDir": "./",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
+    "target": "ES2020",                   // Compila para JS moderno
+    "module": "ESNext",                   // Usar import/export
+    "moduleResolution": "node",           // Resolução de módulos Node
+    "outDir": "./dist",                   // Saída compilada
+    "rootDir": "./",                      
+
+    "strict": true,                       // Habilita todas as verificações de tipo
+    "noImplicitAny": true,                // Impede 'any' implícito
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "forceConsistentCasingInFileNames": true,
+
+    "esModuleInterop": true,              // Para compatibilidade com import default
+    "skipLibCheck": true,                 // Ignora checagem de tipos de libs externas
+    "resolveJsonModule": true,            // Permite importar arquivos JSON
+    "allowJs": true,                      
+
+    "isolatedModules": true,
+    "noEmitOnError": true,                // Não gera JS se houver erros
+    "incremental": true,
+    "ignoreDeprecations": "6.0"           // Ignora avisos de deprecated
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["./**/*.ts"],               // Todos arquivos TS no projeto
+  "exclude": ["node_modules", "dist"]    // Ignora node_modules e dist
 }

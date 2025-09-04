@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { db } from "../conexaoSQL.js";
+import { db } from "../database/conexaoSQL";
 
-export const getUsers = (_req: Request, res: Response) => {
-  const q = "SELECT * FROM produtos";
-
-  db.query(q, (err: any, data: any) => {
-    if (err) return res.status(500).send(err);
-    return res.status(200).json(data);
-  });
+export const getUsers = async (_req: Request, res: Response) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM users");
+    res.json(rows);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
 };

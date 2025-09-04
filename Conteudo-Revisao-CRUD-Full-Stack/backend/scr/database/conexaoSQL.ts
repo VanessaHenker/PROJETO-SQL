@@ -1,20 +1,11 @@
-import mysql from "mysql2";
-import { Request, Response } from "express";
+import mysql, { Pool } from "mysql2/promise";
 
-// Conexão com o banco
-export const db = mysql.createConnection({
+export const db: Pool = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
-  database: "MeuBanco2",
+  database: "nome_do_banco",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
-
-// Função para pegar usuários
-export const getUsers = (_req: Request, res: Response) => {
-  const q = "SELECT * FROM produtos";
-
-  db.query(q, (err, data) => {
-    if (err) return res.status(500).send(err);
-    return res.status(200).json(data);
-  });
-};

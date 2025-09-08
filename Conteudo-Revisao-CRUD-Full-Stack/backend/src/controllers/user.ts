@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { db } from "../database/conexaoSQL";
+import { db } from '../database/conexaoSQL.js';
 
 export const getUsers = async (_req: Request, res: Response) => {
   try {

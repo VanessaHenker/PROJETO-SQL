@@ -4,7 +4,7 @@ export const db: Pool = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
-  database: "nome_do_banco",
+  database: "MeuBanco2",
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

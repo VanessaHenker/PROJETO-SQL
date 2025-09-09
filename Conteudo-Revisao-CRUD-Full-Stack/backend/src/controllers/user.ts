@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db } from "../database/conexaoSQL";
+import { db } from "../database/conexaoSQL.js";
 
 const router = Router();
 

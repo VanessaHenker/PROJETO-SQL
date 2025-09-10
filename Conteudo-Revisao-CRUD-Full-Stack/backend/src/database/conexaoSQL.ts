@@ -7,5 +7,6 @@ export const db: Pool = mysql.createPool({
   database: "MeuBanco2",
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  decimalNumbers: true 
 });

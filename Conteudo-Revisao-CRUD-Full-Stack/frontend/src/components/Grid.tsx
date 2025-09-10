@@ -1,19 +1,13 @@
-import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Button,
-} from "@mui/material";
+import { Table, TableHead, TableBody, TableRow, TableCell, Button } from "@mui/material";
 
 interface Produto {
-  id: number;
+  produto_id: number;
   nome: string;
   descricao: string;
-  preco: number;
+  preco: number | string;
   quantidade_estoque: number;
   data_cadastro: string;
+  imagem_url?: string | null;
 }
 
 interface GridProps {
@@ -31,43 +25,24 @@ function Grid({ produtos, onEdit, onDelete }: GridProps) {
           <TableCell>Nome</TableCell>
           <TableCell>Descrição</TableCell>
           <TableCell>Preço</TableCell>
-          <TableCell>Quantidade em Estoque</TableCell>
-          <TableCell>Data de Cadastro</TableCell>
+          <TableCell>Quantidade</TableCell>
+          <TableCell>Data</TableCell>
           <TableCell>Ações</TableCell>
         </TableRow>
       </TableHead>
 
       <TableBody>
         {produtos.map((produto) => (
-          <TableRow key={produto.id}>
-            <TableCell>{produto.id}</TableCell>
+          <TableRow key={produto.produto_id}>
+            <TableCell>{produto.produto_id}</TableCell>
             <TableCell>{produto.nome}</TableCell>
             <TableCell>{produto.descricao}</TableCell>
-            <TableCell>{produto.preco.toFixed(2)}</TableCell>
+            <TableCell>{Number(produto.preco).toFixed(2)}</TableCell>
             <TableCell>{produto.quantidade_estoque}</TableCell>
-            <TableCell>{produto.data_cadastro}</TableCell>
+            <TableCell>{produto.data_cadastro ? new Date(produto.data_cadastro).toLocaleDateString() : ""}</TableCell>
             <TableCell>
-              {onEdit && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => onEdit(produto)}
-                  style={{ marginRight: 8 }}
-                >
-                  Editar
-                </Button>
-              )}
-              {onDelete && (
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  onClick={() => onDelete(produto)}
-                >
-                  Excluir
-                </Button>
-              )}
+              {onEdit && <Button size="small" onClick={() => onEdit(produto)}>Editar</Button>}
+              {onDelete && <Button size="small" color="error" onClick={() => onDelete(produto)}>Excluir</Button>}
             </TableCell>
           </TableRow>
         ))}

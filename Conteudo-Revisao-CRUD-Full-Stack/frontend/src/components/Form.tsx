@@ -1,16 +1,11 @@
+// src/components/Form.tsx
 import { useEffect, useState } from "react";
 import styles from "../styles/form.module.css";
 import ImgForm from "./ImgForm";
-import { Produto } from "../App";
+import type { Produto } from "../types/typesSQL";
+import type { FormEvent } from "react";
 
-type FormPayload = {
-  nome: string;
-  descricao?: string;
-  preco: number | string;
-  quantidade_estoque: number | string;
-  data_cadastro: string;
-  imagem_url?: string | null;
-};
+type FormPayload = Omit<Produto, "produto_id">;
 
 interface Props {
   produto?: Produto | null;
@@ -44,44 +39,59 @@ const Form = ({ produto, onSubmit, onCancel }: Props) => {
     }
   }, [produto]);
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!nome.trim()) { alert("Nome obrigatório"); return; }
+    if (!nome.trim()) {
+      alert("Nome obrigatório");
+      return;
+    }
     onSubmit({
       nome,
       descricao,
       preco: Number(preco),
       quantidade_estoque: Number(quantidade),
       data_cadastro: dataCadastro,
-      imagem_url: imagemUrl,
+      imagem_url: imagemUrl ?? null,
     });
   }
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <ImgForm imageUrl={imagemUrl} onChange={setImagemUrl} />
+
       <div className={styles.inputArea}>
         <label htmlFor="nome">Nome</label>
-        <input id="nome" value={nome} onChange={e => setNome(e.target.value)} />
+        <input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
       </div>
+
       <div className={styles.inputArea}>
         <label htmlFor="descricao">Descrição</label>
-        <input id="descricao" value={descricao} onChange={e => setDescricao(e.target.value)} />
+        <input id="descricao" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
       </div>
+
       <div className={styles.inputArea}>
         <label htmlFor="preco">Preço</label>
-        <input id="preco" type="number" step="0.01" value={preco} onChange={e => setPreco(e.target.value)} />
+        <input id="preco" name="preco" type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} />
       </div>
+
       <div className={styles.inputArea}>
-        <label htmlFor="quantidade_estoque">Quantidade</label>
-        <input id="quantidade_estoque" type="number" value={quantidade} onChange={e => setQuantidade(e.target.value)} />
+        <label htmlFor="quantidade_estoque">Quantidade em Estoque</label>
+        <input id="quantidade_estoque" name="quantidade_estoque" type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} />
       </div>
+
       <div className={styles.inputArea}>
-        <label htmlFor="data_cadastro">Data</label>
-        <input id="data_cadastro" type="date" value={dataCadastro} onChange={e => setDataCadastro(e.target.value)} />
+        <label htmlFor="data_cadastro">Data de Cadastro</label>
+        <input id="data_cadastro" name="data_cadastro" type="date" value={dataCadastro} onChange={(e) => setDataCadastro(e.target.value)} />
       </div>
-      <button type="submit" className={styles.button}>Salvar</button>
-      {produto && <button type="button" onClick={onCancel}>Cancelar</button>}
+
+      <button type="submit" className={styles.button}>
+        Salvar
+      </button>
+      {produto && (
+        <button type="button" onClick={onCancel} className={styles.button}>
+          Cancelar
+        </button>
+      )}
     </form>
   );
 };

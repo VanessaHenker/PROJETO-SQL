@@ -1,97 +1,67 @@
-// src/components/Form.tsx
-import { useEffect, useState } from "react";
-import styles from "../styles/form.module.css";
-import ImgForm from "./ImgForm";
-import type { Produto } from "../types/typesSQL";
-import type { FormEvent } from "react";
+import React, { useState } from "react";
 
-type FormPayload = Omit<Produto, "produto_id">;
+// Definindo as props que o Form aceita
+export type ProdutoFormData = {
+  nome: string;
+  preco: number;
+  imageUrl: string | null;
+};
 
-interface Props {
-  produto?: Produto | null;
-  onSubmit: (payload: FormPayload) => void;
-  onCancel?: () => void;
-}
+type FormProps = {
+  onSubmit: (formData: ProdutoFormData) => void | Promise<void>;
+};
 
-const Form = ({ produto, onSubmit, onCancel }: Props) => {
+const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [preco, setPreco] = useState("");
-  const [quantidade, setQuantidade] = useState("");
-  const [dataCadastro, setDataCadastro] = useState("");
-  const [imagemUrl, setImagemUrl] = useState<string | null>(null);
+  const [preco, setPreco] = useState<number>(0);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (produto) {
-      setNome(produto.nome ?? "");
-      setDescricao(produto.descricao ?? "");
-      setPreco(String(produto.preco ?? ""));
-      setQuantidade(String(produto.quantidade_estoque ?? ""));
-      setDataCadastro(produto.data_cadastro ? produto.data_cadastro.split("T")[0] : "");
-      setImagemUrl(produto.imagem_url ?? null);
-    } else {
-      setNome("");
-      setDescricao("");
-      setPreco("");
-      setQuantidade("");
-      setDataCadastro("");
-      setImagemUrl(null);
-    }
-  }, [produto]);
-
-  function handleSubmit(e: FormEvent) {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nome.trim()) {
-      alert("Nome obrigatório");
-      return;
-    }
-    onSubmit({
-      nome,
-      descricao,
-      preco: Number(preco),
-      quantidade_estoque: Number(quantidade),
-      data_cadastro: dataCadastro,
-      imagem_url: imagemUrl ?? null,
-    });
-  }
+    onSubmit({ nome, preco, imageUrl });
+  };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
-      <ImgForm imageUrl={imagemUrl} onChange={setImagemUrl} />
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <input
+        type="text"
+        placeholder="Nome do produto"
+        value={nome}
+        onChange={(e) => setNome(e.target.value)}
+        required
+      />
 
-      <div className={styles.inputArea}>
-        <label htmlFor="nome">Nome</label>
-        <input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-      </div>
+      <input
+        type="number"
+        placeholder="Preço"
+        value={preco}
+        onChange={(e) => setPreco(Number(e.target.value))}
+        required
+      />
 
-      <div className={styles.inputArea}>
-        <label htmlFor="descricao">Descrição</label>
-        <input id="descricao" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
-      </div>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0] || null;
+          if (file) {
+            const imagePreview = URL.createObjectURL(file);
+            setImageUrl(imagePreview);
+          } else {
+            setImageUrl(null);
+          }
+        }}
+      />
 
-      <div className={styles.inputArea}>
-        <label htmlFor="preco">Preço</label>
-        <input id="preco" name="preco" type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} />
-      </div>
-
-      <div className={styles.inputArea}>
-        <label htmlFor="quantidade_estoque">Quantidade em Estoque</label>
-        <input id="quantidade_estoque" name="quantidade_estoque" type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} />
-      </div>
-
-      <div className={styles.inputArea}>
-        <label htmlFor="data_cadastro">Data de Cadastro</label>
-        <input id="data_cadastro" name="data_cadastro" type="date" value={dataCadastro} onChange={(e) => setDataCadastro(e.target.value)} />
-      </div>
-
-      <button type="submit" className={styles.button}>
-        Salvar
-      </button>
-      {produto && (
-        <button type="button" onClick={onCancel} className={styles.button}>
-          Cancelar
-        </button>
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt="Pré-visualização"
+          style={{ width: "200px", height: "auto", marginTop: "10px" }}
+        />
       )}
+
+      <button type="submit">Salvar Produto</button>
     </form>
   );
 };

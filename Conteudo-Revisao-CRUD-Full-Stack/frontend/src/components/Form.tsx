@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import styles from "../styles/form.module.css";
 
-// Definindo as props que o Form aceita
+
 export type ProdutoFormData = {
   nome: string;
   preco: number;
@@ -22,13 +23,14 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <form onSubmit={handleSubmit} className={styles.formContainer}>
       <input
         type="text"
         placeholder="Nome do produto"
         value={nome}
         onChange={(e) => setNome(e.target.value)}
         required
+        className={styles.input}
       />
 
       <input
@@ -37,6 +39,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         value={preco}
         onChange={(e) => setPreco(Number(e.target.value))}
         required
+        className={styles.input}
       />
 
       <input
@@ -51,17 +54,20 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
             setImageUrl(null);
           }
         }}
+        className={styles.inputFile}
       />
 
       {imageUrl && (
         <img
           src={imageUrl}
           alt="Pré-visualização"
-          style={{ width: "200px", height: "auto", marginTop: "10px" }}
+          className={styles.imagePreview}
         />
       )}
 
-      <button type="submit">Salvar Produto</button>
+      <button type="submit" className={styles.button}>
+        Salvar Produto
+      </button>
     </form>
   );
 };

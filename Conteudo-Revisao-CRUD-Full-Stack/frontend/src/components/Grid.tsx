@@ -1,54 +1,70 @@
-import type { Produto } from "../types/typesSQL";
-import { Table, TableHead, TableBody, TableRow, TableCell, Button } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import Form, { ProdutoFormData } from "./components/Form";
+import Grid from "./components/Grid";
+import type { Produto } from "./types/typesSQL";
 
-interface GridProps {
-  produtos: Produto[];
-  onEdit?: (produto: Produto) => void;
+const App: React.FC = () => {
+  const [produtos, setProdutos] = useState<Produto[]>([]);
 
-  onDelete?: (produto: Produto) => void | Promise<void>;
-}
+  // Buscar produtos do backend
+  const fetchProdutos = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/produtos");
+      const data = await res.json();
+      setProdutos(data);
+    } catch (err) {
+      console.error("Erro ao buscar produtos:", err);
+    }
+  };
 
-function Grid({ produtos, onEdit, onDelete }: GridProps) {
+  useEffect(() => {
+    fetchProdutos();
+  }, []);
+
+  // Adicionar produto
+  const addProduto = async (produto: ProdutoFormData) => {
+    try {
+      const res = await fetch("http://localhost:3001/produtos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(produto),
+      });
+
+      if (res.ok) {
+        fetchProdutos();
+      } else {
+        console.error("Erro ao salvar produto");
+      }
+    } catch (err) {
+      console.error("Erro na requisição:", err);
+    }
+  };
+
+  // Excluir produto
+  const deleteProduto = async (produto: Produto) => {
+    try {
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        fetchProdutos();
+      } else {
+        console.error("Erro ao excluir produto");
+      }
+    } catch (err) {
+      console.error("Erro na requisição:", err);
+    }
+  };
+
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>ID</TableCell>
-          <TableCell>Nome</TableCell>
-          <TableCell>Descrição</TableCell>
-          <TableCell>Preço</TableCell>
-          <TableCell>Quantidade em Estoque</TableCell>
-          <TableCell>Data de Cadastro</TableCell>
-          <TableCell>Ações</TableCell>
-        </TableRow>
-      </TableHead>
+    <div className="App">
+      <h1>Cadastro de Produtos</h1>
+      <Form onSubmit={addProduto} />
 
-      <TableBody>
-        {produtos.map((produto) => (
-          <TableRow key={produto.produto_id}>
-            <TableCell>{produto.produto_id}</TableCell>
-            <TableCell>{produto.nome}</TableCell>
-            <TableCell>{produto.descricao}</TableCell>
-            <TableCell>{produto.preco.toFixed(2)}</TableCell>
-            <TableCell>{produto.quantidade_estoque}</TableCell>
-            <TableCell>{produto.data_cadastro ? new Date(produto.data_cadastro).toLocaleDateString() : ""}</TableCell>
-            <TableCell>
-              {onEdit && (
-                <Button variant="contained" size="small" onClick={() => onEdit(produto)} style={{ marginRight: 8 }}>
-                  Editar
-                </Button>
-              )}
-              {onDelete && (
-                <Button variant="contained" color="error" size="small" onClick={() => onDelete(produto)}>
-                  Excluir
-                </Button>
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+      <h2>Lista de Produtos</h2>
+      <Grid produtos={produtos} onDelete={deleteProduto} />
+    </div>
   );
-}
+};
 
-export default Grid;
+export default App;

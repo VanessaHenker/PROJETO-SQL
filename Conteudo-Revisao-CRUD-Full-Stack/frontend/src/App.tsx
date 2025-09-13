@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Form from "./components/Form";
-
-type Produto = {
-  id: number;
-  nome: string;
-  preco: number;
-  imageUrl: string | null;
-};
+import Form, { ProdutoFormData } from "./components/Form";
+import Grid from "./components/Grid";
+import type { Produto } from "./types/typesSQL";
 
 const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
-  // Buscar produtos do backend
   const fetchProdutos = async () => {
     try {
       const res = await fetch("http://localhost:3001/produtos");
@@ -26,8 +20,8 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  // Adicionar produto
-  const addProduto = async (produto: { nome: string; preco: number; imageUrl: string | null }) => {
+  // ✅ aqui corrige
+  const addProduto = async (produto: ProdutoFormData) => {
     try {
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
@@ -45,28 +39,28 @@ const App: React.FC = () => {
     }
   };
 
+  const deleteProduto = async (produto: Produto) => {
+    try {
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        fetchProdutos();
+      } else {
+        console.error("Erro ao excluir produto");
+      }
+    } catch (err) {
+      console.error("Erro na requisição:", err);
+    }
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="App">
       <h1>Cadastro de Produtos</h1>
       <Form onSubmit={addProduto} />
 
       <h2>Lista de Produtos</h2>
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {produtos.map((p) => (
-          <li key={p.id} style={{ marginBottom: "20px" }}>
-            <strong>{p.nome}</strong> - R$ {p.preco.toFixed(2)}
-            {p.imageUrl && (
-              <div>
-                <img
-                  src={p.imageUrl}
-                  alt={p.nome}
-                  style={{ width: "150px", marginTop: "10px" }}
-                />
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+      <Grid produtos={produtos} onDelete={deleteProduto} />
     </div>
   );
 };

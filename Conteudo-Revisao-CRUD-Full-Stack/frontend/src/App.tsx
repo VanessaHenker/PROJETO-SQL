@@ -6,6 +6,7 @@ import type { Produto } from "./types/typesSQL";
 const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
+  // Buscar produtos do backend
   const fetchProdutos = async () => {
     try {
       const res = await fetch("http://localhost:3001/produtos");
@@ -20,7 +21,7 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  // ✅ aqui corrige
+  // Adicionar produto
   const addProduto = async (produto: ProdutoFormData) => {
     try {
       const res = await fetch("http://localhost:3001/produtos", {
@@ -39,9 +40,10 @@ const App: React.FC = () => {
     }
   };
 
+  // Excluir produto
   const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
+      const res = await fetch(`http://localhost:3001/produtos/${produto.id}`, {
         method: "DELETE",
       });
       if (res.ok) {

@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Form, { ProdutoFormData } from "./components/Form";
-import Grid from "./components/Grid";
-import type { Produto } from "./types/typesSQL";
+import Form from "./components/Form";
+
+type Produto = {
+  id: number;
+  nome: string;
+  preco: number;
+  imageUrl: string | null;
+};
 
 const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -22,7 +27,7 @@ const App: React.FC = () => {
   }, []);
 
   // Adicionar produto
-  const addProduto = async (produto: ProdutoFormData) => {
+  const addProduto = async (produto: { nome: string; preco: number; imageUrl: string | null }) => {
     try {
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
@@ -40,29 +45,28 @@ const App: React.FC = () => {
     }
   };
 
-  // Excluir produto
-  const deleteProduto = async (produto: Produto) => {
-    try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        fetchProdutos();
-      } else {
-        console.error("Erro ao excluir produto");
-      }
-    } catch (err) {
-      console.error("Erro na requisição:", err);
-    }
-  };
-
   return (
-    <div className="App">
+    <div style={{ padding: "20px" }}>
       <h1>Cadastro de Produtos</h1>
       <Form onSubmit={addProduto} />
 
       <h2>Lista de Produtos</h2>
-      <Grid produtos={produtos} onDelete={deleteProduto} />
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {produtos.map((p) => (
+          <li key={p.id} style={{ marginBottom: "20px" }}>
+            <strong>{p.nome}</strong> - R$ {p.preco.toFixed(2)}
+            {p.imageUrl && (
+              <div>
+                <img
+                  src={p.imageUrl}
+                  alt={p.nome}
+                  style={{ width: "150px", marginTop: "10px" }}
+                />
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

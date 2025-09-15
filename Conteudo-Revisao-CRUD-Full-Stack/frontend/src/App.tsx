@@ -3,6 +3,7 @@ import type { ProdutoFormData } from "./components/Form";
 import Form from "./components/Form";
 import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
+import styles from "./styles/app.module.css"; 
 
 const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -59,12 +60,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="App">
-      <h1>Cadastro de Produtos</h1>
+    <div className={styles.app}>
+      <h1 className={styles.title}>Cadastro de Produtos</h1>
       <Form onSubmit={addProduto} />
 
-      <h2>Lista de Produtos</h2>
-      <Grid produtos={produtos} onDelete={deleteProduto} />
+      <h2 className={styles.subtitle}>Lista de Produtos</h2>
+      <div className={styles.grid}>
+        <Grid produtos={produtos} onDelete={deleteProduto} />
+      </div>
     </div>
   );
 };

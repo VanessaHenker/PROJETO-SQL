@@ -1,0 +1,64 @@
+
+.app {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+
+  padding: 2rem;
+  background: linear-gradient(135deg, #fffaf0, #ffe4b5);
+  min-height: 100vh;
+}
+
+h1 {
+  color: #d35400;
+  margin-bottom: 1rem;
+  margin: auto;
+}
+
+h2 {
+  color: #444;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  background: #e67e22;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  margin: 0.5rem;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #d35400;
+}
+
+input {
+  padding: 0.5rem;
+  margin: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 250px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}

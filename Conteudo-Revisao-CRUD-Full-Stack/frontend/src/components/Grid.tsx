@@ -1,70 +1,31 @@
-import React, { useEffect, useState } from "react";
-import Form, { ProdutoFormData } from "./components/Form";
-import Grid from "./components/Grid";
-import type { Produto } from "./types/typesSQL";
+import React from "react";
+import type { Produto } from "../types/typesSQL";
 
-const App: React.FC = () => {
-  const [produtos, setProdutos] = useState<Produto[]>([]);
+type GridProps = {
+  produtos: Produto[];
+  onDelete: (produto: Produto) => void;
+};
 
-  // Buscar produtos do backend
-  const fetchProdutos = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/produtos");
-      const data = await res.json();
-      setProdutos(data);
-    } catch (err) {
-      console.error("Erro ao buscar produtos:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchProdutos();
-  }, []);
-
-  // Adicionar produto
-  const addProduto = async (produto: ProdutoFormData) => {
-    try {
-      const res = await fetch("http://localhost:3001/produtos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produto),
-      });
-
-      if (res.ok) {
-        fetchProdutos();
-      } else {
-        console.error("Erro ao salvar produto");
-      }
-    } catch (err) {
-      console.error("Erro na requisição:", err);
-    }
-  };
-
-  // Excluir produto
-  const deleteProduto = async (produto: Produto) => {
-    try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        fetchProdutos();
-      } else {
-        console.error("Erro ao excluir produto");
-      }
-    } catch (err) {
-      console.error("Erro na requisição:", err);
-    }
-  };
-
+const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
   return (
-    <div className="App">
-      <h1>Cadastro de Produtos</h1>
-      <Form onSubmit={addProduto} />
-
-      <h2>Lista de Produtos</h2>
-      <Grid produtos={produtos} onDelete={deleteProduto} />
-    </div>
+    <ul style={{ listStyle: "none", padding: 0 }}>
+      {produtos.map((p) => (
+        <li key={p.produto_id} style={{ marginBottom: "20px" }}>
+          <strong>{p.nome}</strong> - R$ {p.preco.toFixed(2)}
+          {p.imagem_url && (
+            <div>
+              <img
+                src={p.imagem_url}
+                alt={p.nome}
+                style={{ width: "150px", marginTop: "10px" }}
+              />
+            </div>
+          )}
+          <button onClick={() => onDelete(p)}>Excluir</button>
+        </li>
+      ))}
+    </ul>
   );
 };
 
-export default App;
+export default Grid;

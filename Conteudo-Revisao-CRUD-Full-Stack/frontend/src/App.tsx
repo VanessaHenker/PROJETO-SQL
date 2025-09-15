@@ -60,16 +60,21 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={styles.app}>
+  <div className={styles.app}>
+    <div className={styles.container}>
       <h1 className={styles.title}>Cadastro de Produtos</h1>
       <Form onSubmit={addProduto} />
+    </div>
 
+    <div className={styles.container}>
       <h2 className={styles.subtitle}>Lista de Produtos</h2>
       <div className={styles.grid}>
         <Grid produtos={produtos} onDelete={deleteProduto} />
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default App;

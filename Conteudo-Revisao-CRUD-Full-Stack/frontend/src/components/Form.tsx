@@ -24,10 +24,10 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
-        <label>Nome do Produto</label>
+        <label>Nome</label>
         <input
           type="text"
-          placeholder="Nome do produto"
+          placeholder="Ex: Bolo de Chocolate"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
@@ -36,10 +36,10 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       </div>
 
       <div className={styles.inputArea}>
-        <label>Preço</label>
+        <label>Preço (R$)</label>
         <input
           type="number"
-          placeholder="Preço"
+          placeholder="Ex: 25,00"
           value={preco}
           onChange={(e) => setPreco(Number(e.target.value))}
           required
@@ -48,7 +48,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       </div>
 
       <div className={styles.inputArea}>
-        <label>Imagem</label>
+        <label>Imagem do Produto</label>
         <input
           type="file"
           accept="image/*"

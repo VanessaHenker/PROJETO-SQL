@@ -16,17 +16,18 @@ type FormProps = {
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [preco, setPreco] = useState<number>(0);
-  const [quantidade, setQuantidade] = useState<number>(1);
+  const [preco, setPreco] = useState<string>(""); // <- agora string
+  const [quantidade, setQuantidade] = useState<string>(""); // <- agora string
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     onSubmit({
       nome,
       descricao,
-      preco,
-      quantidade_estoque: quantidade,
+      preco: preco === "" ? 0 : Number(preco), // conversão no submit
+      quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
       imagem_url: imagemUrl,
     });
   };
@@ -62,7 +63,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
           type="number"
           placeholder="Ex: 25,00"
           value={preco}
-          onChange={(e) => setPreco(Number(e.target.value))}
+          onChange={(e) => setPreco(e.target.value)}
           required
           className={styles.input}
         />
@@ -72,9 +73,9 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         <label>Quantidade em Estoque</label>
         <input
           type="number"
-          min="1"
+          placeholder="Ex: 10"
           value={quantidade}
-          onChange={(e) => setQuantidade(Number(e.target.value))}
+          onChange={(e) => setQuantidade(e.target.value)}
           required
           className={styles.input}
         />

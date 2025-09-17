@@ -27,12 +27,20 @@ const App: React.FC = () => {
   // Adicionar produto
   const addProduto = async (produto: ProdutoFormData) => {
     try {
-      // Preenche campos obrigatórios do backend se não vier do front
+      const agora = new Date().toLocaleString("pt-BR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+
       const produtoCompleto = {
         ...produto,
         descricao: produto.descricao ?? "",
         quantidade_estoque: produto.quantidade_estoque ?? 0,
-        data_cadastro: new Date().toISOString().slice(0, 10), // yyyy-mm-dd
+        data_cadastro: agora,
       };
 
       const res = await fetch("http://localhost:3001/produtos", {
@@ -44,7 +52,6 @@ const App: React.FC = () => {
       if (!res.ok) throw new Error("Erro ao salvar produto");
       const novoProduto = await res.json();
 
-      // Atualiza estado local sem precisar chamar fetchProdutos
       setProdutos((prev) => [...prev, novoProduto]);
     } catch (err) {
       console.error(err);
@@ -54,10 +61,9 @@ const App: React.FC = () => {
   // Excluir produto
   const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(
-        `http://localhost:3001/produtos/${produto.produto_id}`,
-        { method: "DELETE" }
-      );
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error("Erro ao excluir produto");
       setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
     } catch (err) {
@@ -74,9 +80,7 @@ const App: React.FC = () => {
 
       <div className={styles.container}>
         <h2 className={styles.subtitle}>Lista de Produtos</h2>
-        <div className={styles.grid}>
-          <Grid produtos={produtos} onDelete={deleteProduto} />
-        </div>
+        <Grid produtos={produtos} onDelete={deleteProduto} />
       </div>
     </div>
   );

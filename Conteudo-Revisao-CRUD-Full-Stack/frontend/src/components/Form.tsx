@@ -1,8 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import styles from "../styles/form.module.css";
 import type { Produto } from "../types/typesSQL";
 
-// Campos do form (não precisa de produto_id)
 export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
@@ -19,7 +18,6 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Data/hora local no momento do clique
     const agora = new Date().toLocaleString("pt-BR", {
       year: "numeric",
       month: "2-digit",
@@ -38,7 +36,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       data_cadastro: agora,
     });
 
-    // reset opcional
+    // Reset do form
     setNome("");
     setDescricao("");
     setPreco("");
@@ -116,11 +114,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
 
       {imagemUrl && (
         <div className={styles.preview}>
-          <img
-            src={imagemUrl}
-            alt="Pré-visualização"
-            className={styles.previewImg}
-          />
+          <img src={imagemUrl} alt="Pré-visualização" className={styles.previewImg} />
         </div>
       )}
 

@@ -3,7 +3,9 @@ import styles from "../styles/form.module.css";
 
 export type ProdutoFormData = {
   nome: string;
+  descricao: string;
   preco: number;
+  quantidade_estoque: number;
   imagem_url: string | null;
 };
 
@@ -13,12 +15,20 @@ type FormProps = {
 
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState<number>(0);
+  const [quantidade, setQuantidade] = useState<number>(1);
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ nome, preco, imagem_url: imagemUrl });
+    onSubmit({
+      nome,
+      descricao,
+      preco,
+      quantidade_estoque: quantidade,
+      imagem_url: imagemUrl,
+    });
   };
 
   return (
@@ -36,12 +46,35 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       </div>
 
       <div className={styles.inputArea}>
+        <label>Descrição</label>
+        <textarea
+          placeholder="Ex: Bolo fofinho com cobertura de chocolate"
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          required
+          className={styles.textarea}
+        />
+      </div>
+
+      <div className={styles.inputArea}>
         <label>Preço (R$)</label>
         <input
           type="number"
           placeholder="Ex: 25,00"
           value={preco}
           onChange={(e) => setPreco(Number(e.target.value))}
+          required
+          className={styles.input}
+        />
+      </div>
+
+      <div className={styles.inputArea}>
+        <label>Quantidade em Estoque</label>
+        <input
+          type="number"
+          min="1"
+          value={quantidade}
+          onChange={(e) => setQuantidade(Number(e.target.value))}
           required
           className={styles.input}
         />

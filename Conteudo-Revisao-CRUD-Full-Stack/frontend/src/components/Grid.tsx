@@ -8,8 +8,21 @@ type GridProps = {
 };
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
-  if (produtos.length === 0) {
-    return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+  if (!produtos.length) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+
+  function formatarDataBrasilia(dataISO: string) {
+    const data = new Date(dataISO);
+    const offset = -3; 
+    data.setHours(data.getHours() + offset);
+    return data.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
   }
 
   return (
@@ -20,11 +33,9 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
           {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className={styles.image} />}
           <p><strong>Descrição:</strong> {p.descricao}</p>
           <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
-          <p><strong>Quantidade em estoque:</strong> {p.quantidade_estoque}</p>
-          <p><strong>Data de cadastro:</strong> {p.data_cadastro}</p>
-          <button onClick={() => onDelete(p)} className={styles.button}>
-            Excluir
-          </button>
+          <p><strong>Quantidade:</strong> {p.quantidade_estoque}</p>
+          <p><strong>Data de cadastro:</strong> {formatarDataBrasilia(p.data_cadastro)}</p>
+          <button className={styles.button} onClick={() => onDelete(p)}>Excluir</button>
         </li>
       ))}
     </ul>

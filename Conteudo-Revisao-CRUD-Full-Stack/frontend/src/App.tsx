@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import type { ProdutoFormData } from "./components/Form";
 import Form from "./components/Form";
+import type { ProdutoFormData } from "./components/Form"; 
 import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
-import styles from "./styles/app.module.css"; 
+import styles from "./styles/app.module.css";
 
 const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -27,14 +27,8 @@ const App: React.FC = () => {
   // Adicionar produto
   const addProduto = async (produto: ProdutoFormData) => {
     try {
-      const agora = new Date().toLocaleString("pt-BR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
+      // Data/hora completa para MySQL
+      const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // YYYY-MM-DD HH:mm:ss
 
       const produtoCompleto = {
         ...produto,
@@ -61,9 +55,7 @@ const App: React.FC = () => {
   // Excluir produto
   const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Erro ao excluir produto");
       setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
     } catch (err) {

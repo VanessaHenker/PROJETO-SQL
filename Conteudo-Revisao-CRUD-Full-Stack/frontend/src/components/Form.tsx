@@ -19,12 +19,8 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     e.preventDefault();
 
     const agora = new Date().toLocaleString("pt-BR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
     });
 
     onSubmit({
@@ -36,7 +32,6 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       data_cadastro: agora,
     });
 
-    // Reset do form
     setNome("");
     setDescricao("");
     setPreco("");
@@ -48,79 +43,35 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
         <label>Nome</label>
-        <input
-          type="text"
-          placeholder="Ex: Bolo de Chocolate"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} placeholder="Ex: Bolo de Chocolate"/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Descrição</label>
-        <textarea
-          placeholder="Ex: Bolo fofinho com cobertura de chocolate"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          required
-          className={styles.textarea}
-        />
+        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} placeholder="Ex: Bolo fofinho"/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Preço (R$)</label>
-        <input
-          type="number"
-          step="0.01"
-          placeholder="Ex: 25,00"
-          value={preco}
-          onChange={(e) => setPreco(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Quantidade em Estoque</label>
-        <input
-          type="number"
-          placeholder="Ex: 10"
-          value={quantidade}
-          onChange={(e) => setQuantidade(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
-        <label>Imagem do Produto</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0] || null;
-            if (file) {
-              const imagePreview = URL.createObjectURL(file);
-              setImagemUrl(imagePreview);
-            } else {
-              setImagemUrl(null);
-            }
-          }}
-          className={styles.inputFile}
-        />
+        <label>Imagem</label>
+        <input type="file" accept="image/*" onChange={(e) => {
+          const file = e.target.files?.[0] || null;
+          setImagemUrl(file ? URL.createObjectURL(file) : null);
+        }} className={styles.inputFile}/>
       </div>
 
-      {imagemUrl && (
-        <div className={styles.preview}>
-          <img src={imagemUrl} alt="Pré-visualização" className={styles.previewImg} />
-        </div>
-      )}
+      {imagemUrl && <div className={styles.preview}><img src={imagemUrl} alt="Pré-visualização" className={styles.previewImg}/></div>}
 
-      <button type="submit" className={styles.button}>
-        Salvar Produto
-      </button>
+      <button type="submit" className={styles.button}>Salvar Produto</button>
     </form>
   );
 };

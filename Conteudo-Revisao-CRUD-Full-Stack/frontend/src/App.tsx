@@ -12,10 +12,11 @@ const App: React.FC = () => {
   const fetchProdutos = async () => {
     try {
       const res = await fetch("http://localhost:3001/produtos");
+      if (!res.ok) throw new Error("Erro ao buscar produtos");
       const data = await res.json();
       setProdutos(data);
     } catch (err) {
-      console.error("Erro ao buscar produtos:", err);
+      console.error(err);
     }
   };
 
@@ -26,19 +27,27 @@ const App: React.FC = () => {
   // Adicionar produto
   const addProduto = async (produto: ProdutoFormData) => {
     try {
+      // Preenche campos obrigatórios do backend se não vier do front
+      const produtoCompleto = {
+        ...produto,
+        descricao: produto.descricao ?? "",
+        quantidade_estoque: produto.quantidade_estoque ?? 0,
+        data_cadastro: new Date().toISOString().slice(0, 10), // yyyy-mm-dd
+      };
+
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produto),
+        body: JSON.stringify(produtoCompleto),
       });
 
-      if (res.ok) {
-        fetchProdutos();
-      } else {
-        console.error("Erro ao salvar produto");
-      }
+      if (!res.ok) throw new Error("Erro ao salvar produto");
+      const novoProduto = await res.json();
+
+      // Atualiza estado local sem precisar chamar fetchProdutos
+      setProdutos((prev) => [...prev, novoProduto]);
     } catch (err) {
-      console.error("Erro na requisição:", err);
+      console.error(err);
     }
   };
 
@@ -49,32 +58,28 @@ const App: React.FC = () => {
         `http://localhost:3001/produtos/${produto.produto_id}`,
         { method: "DELETE" }
       );
-      if (res.ok) {
-        fetchProdutos();
-      } else {
-        console.error("Erro ao excluir produto");
-      }
+      if (!res.ok) throw new Error("Erro ao excluir produto");
+      setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
     } catch (err) {
-      console.error("Erro na requisição:", err);
+      console.error(err);
     }
   };
 
   return (
-  <div className={styles.app}>
-    <div className={styles.container}>
-      <h1 className={styles.title}>Cadastro de Produtos</h1>
-      <Form onSubmit={addProduto} />
-    </div>
+    <div className={styles.app}>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Cadastro de Produtos</h1>
+        <Form onSubmit={addProduto} />
+      </div>
 
-    <div className={styles.container}>
-      <h2 className={styles.subtitle}>Lista de Produtos</h2>
-      <div className={styles.grid}>
-        <Grid produtos={produtos} onDelete={deleteProduto} />
+      <div className={styles.container}>
+        <h2 className={styles.subtitle}>Lista de Produtos</h2>
+        <div className={styles.grid}>
+          <Grid produtos={produtos} onDelete={deleteProduto} />
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 };
 
 export default App;

@@ -17,6 +17,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
       {produtos.map((p) => (
         <li key={p.produto_id} className={styles.card}>
           <h3 className={styles.nome}>{p.nome}</h3>
+
           {p.imagem_url && (
             <img
               src={p.imagem_url}
@@ -28,6 +29,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
           <p><strong>Descrição:</strong> {p.descricao}</p>
           <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
           <p><strong>Quantidade em estoque:</strong> {p.quantidade_estoque}</p>
+          <p><strong>Data de cadastro:</strong> {p.data_cadastro}</p>
 
           <button
             onClick={() => onDelete(p)}

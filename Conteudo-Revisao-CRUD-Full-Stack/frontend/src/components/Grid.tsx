@@ -29,19 +29,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
           <p><strong>Descrição:</strong> {p.descricao}</p>
           <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
           <p><strong>Quantidade em estoque:</strong> {p.quantidade_estoque}</p>
-          
-          <p>
-            <strong>Data de cadastro:</strong>{" "}
-            {p.data_cadastro
-              ? new Date(p.data_cadastro).toLocaleDateString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "—"}
-          </p>
+          <p><strong>Data de cadastro:</strong> {p.data_cadastro}</p>
 
           <button
             onClick={() => onDelete(p)}

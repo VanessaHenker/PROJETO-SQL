@@ -1,8 +1,8 @@
-// src/components/Form.tsx
 import { useState } from "react";
 import styles from "../styles/form.module.css";
 import type { Produto } from "../types/typesSQL";
 
+// Campos do form (não precisa de produto_id)
 export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
@@ -19,8 +19,15 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // gera data/hora no momento do clique
-    const agora = new Date().toISOString();
+    // Data/hora local no momento do clique
+    const agora = new Date().toLocaleString("pt-BR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
 
     onSubmit({
       nome,
@@ -31,8 +38,12 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       data_cadastro: agora,
     });
 
-    // opcional: resetar campos após salvar
-    // setNome(""); setDescricao(""); setPreco(""); setQuantidade(""); setImagemUrl(null);
+    // reset opcional
+    setNome("");
+    setDescricao("");
+    setPreco("");
+    setQuantidade("");
+    setImagemUrl(null);
   };
 
   return (

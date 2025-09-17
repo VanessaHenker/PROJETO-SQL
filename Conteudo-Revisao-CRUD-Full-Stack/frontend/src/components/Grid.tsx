@@ -7,6 +7,10 @@ type GridProps = {
 };
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
+  if (produtos.length === 0) {
+    return <p style={{ textAlign: "center", marginTop: "20px" }}>Nenhum produto cadastrado.</p>;
+  }
+
   return (
     <ul style={{ listStyle: "none", padding: 0 }}>
       {produtos.map((p) => (

@@ -16,8 +16,8 @@ type FormProps = {
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [preco, setPreco] = useState<string>(""); // <- agora string
-  const [quantidade, setQuantidade] = useState<string>(""); // <- agora string
+  const [preco, setPreco] = useState<string>(""); 
+  const [quantidade, setQuantidade] = useState<string>(""); 
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -26,7 +26,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     onSubmit({
       nome,
       descricao,
-      preco: preco === "" ? 0 : Number(preco), // conversão no submit
+      preco: preco === "" ? 0 : Number(preco), 
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
       imagem_url: imagemUrl,
     });

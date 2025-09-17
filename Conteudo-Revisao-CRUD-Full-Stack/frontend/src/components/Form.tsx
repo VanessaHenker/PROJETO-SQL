@@ -1,13 +1,9 @@
-import React, { useState } from "react";
+// src/components/Form.tsx
+import { useState } from "react";
 import styles from "../styles/form.module.css";
+import type { Produto } from "../types/typesSQL";
 
-export type ProdutoFormData = {
-  nome: string;
-  descricao: string;
-  preco: number;
-  quantidade_estoque: number;
-  imagem_url: string | null;
-};
+export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
   onSubmit: (formData: ProdutoFormData) => void | Promise<void>;
@@ -16,20 +12,27 @@ type FormProps = {
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [preco, setPreco] = useState<string>(""); 
-  const [quantidade, setQuantidade] = useState<string>(""); 
+  const [preco, setPreco] = useState<string>("");
+  const [quantidade, setQuantidade] = useState<string>("");
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // gera data/hora no momento do clique
+    const agora = new Date().toISOString();
+
     onSubmit({
       nome,
       descricao,
-      preco: preco === "" ? 0 : Number(preco), 
+      preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
       imagem_url: imagemUrl,
+      data_cadastro: agora,
     });
+
+    // opcional: resetar campos após salvar
+    // setNome(""); setDescricao(""); setPreco(""); setQuantidade(""); setImagemUrl(null);
   };
 
   return (
@@ -61,6 +64,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         <label>Preço (R$)</label>
         <input
           type="number"
+          step="0.01"
           placeholder="Ex: 25,00"
           value={preco}
           onChange={(e) => setPreco(e.target.value)}

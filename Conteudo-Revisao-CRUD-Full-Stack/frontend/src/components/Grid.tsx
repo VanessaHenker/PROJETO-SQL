@@ -8,23 +8,26 @@ type GridProps = {
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
   if (produtos.length === 0) {
-    return <p style={{ textAlign: "center", marginTop: "20px" }}>Nenhum produto cadastrado.</p>;
+    return <p>Nenhum produto cadastrado.</p>;
   }
 
   return (
-    <ul style={{ listStyle: "none", padding: 0 }}>
+    <ul>
       {produtos.map((p) => (
-        <li key={p.produto_id} style={{ marginBottom: "20px" }}>
-          <strong>{p.nome}</strong> - R$ {p.preco.toFixed(2)}
+        <li key={p.produto_id}>
+          <h3>{p.nome}</h3>
+          <p><strong>Descrição:</strong> {p.descricao}</p>
+          <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
+          <p><strong>Quantidade em estoque:</strong> {p.quantidade_estoque}</p>
+
           {p.imagem_url && (
-            <div>
-              <img
-                src={p.imagem_url}
-                alt={p.nome}
-                style={{ width: "150px", marginTop: "10px" }}
-              />
-            </div>
+            <img
+              src={p.imagem_url}
+              alt={p.nome}
+              width="150"
+            />
           )}
+
           <button onClick={() => onDelete(p)}>Excluir</button>
         </li>
       ))}

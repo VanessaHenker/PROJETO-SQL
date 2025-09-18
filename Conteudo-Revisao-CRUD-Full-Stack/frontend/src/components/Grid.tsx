@@ -8,11 +8,11 @@ type GridProps = {
 };
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
-  if (!produtos.length) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+  const total = produtos.length;
 
   function formatarDataBrasilia(dataISO: string) {
     const data = new Date(dataISO);
-    const offset = -3; 
+    const offset = -3;
     data.setHours(data.getHours() + offset);
     return data.toLocaleString("pt-BR", {
       day: "2-digit",
@@ -25,20 +25,32 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
     });
   }
 
+  if (!total) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+
   return (
-    <ul className={styles.grid}>
-      {produtos.map((p) => (
-        <li key={p.produto_id} className={styles.card}>
-          <h3 className={styles.nome}>{p.nome}</h3>
-          {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className={styles.image} />}
-          <p><strong>Descrição:</strong> {p.descricao}</p>
-          <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
-          <p><strong>Quantidade:</strong> {p.quantidade_estoque}</p>
-          <p><strong>Data de cadastro:</strong> {formatarDataBrasilia(p.data_cadastro)}</p>
-          <button className={styles.button} onClick={() => onDelete(p)}>Excluir</button>
-        </li>
-      ))}
-    </ul>
+    <>
+      <div className={styles.header}>
+        <h2 className={styles.title}>
+          Lista de Produtos <span className={styles.count}>({total} {total === 1 ? "produto" : "produtos"})</span>
+        </h2>
+      </div>
+
+      <ul className={styles.grid}>
+        {produtos.map((p, index) => (
+          <li key={p.produto_id} className={styles.card}>
+            <h3 className={styles.nome}>
+              #{index + 1} — {p.nome}
+            </h3>
+            {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className={styles.image} />}
+            <p><strong>Descrição:</strong> {p.descricao}</p>
+            <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
+            <p><strong>Quantidade:</strong> {p.quantidade_estoque}</p>
+            <p><strong>Data de cadastro:</strong> {formatarDataBrasilia(p.data_cadastro)}</p>
+            <button className={styles.button} onClick={() => onDelete(p)}>Excluir</button>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 

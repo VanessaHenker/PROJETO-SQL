@@ -35,9 +35,9 @@ export const criarProduto = async (req: Request, res: Response) => {
   try {
     const {
       nome,
-      descricao = "",          // default vazio
-      preco = 0,               // default 0
-      quantidade_estoque = 0,  // default 0
+      descricao = "",          
+      preco = 0,              
+      quantidade_estoque = 0,  
       data_cadastro = new Date().toISOString().slice(0, 10), // yyyy-mm-dd
       imagem_url = null
     } = req.body;

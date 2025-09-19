@@ -1,66 +1,118 @@
-/* ===== Layout da grade ===== */
+/* ===== Grid ===== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 24px;
   padding: 0;
   margin: 20px 0;
   list-style: none;
 }
 
+/* ===== Mensagem de vazio ===== */
+.empty {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #777;
+  margin-top: 40px;
+}
+
 /* ===== Card ===== */
 .card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f0f0f0;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f2f2f2;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-}
-
-/* ===== Título do produto ===== */
-.nome {
-  margin: 0 0 12px 0;
-  color: #222;
-  font-size: 1.2rem;
-  font-weight: 600;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 6px;
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* ===== Imagem ===== */
-.image {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin: 12px 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+.imageWrapper {
+  position: relative;
 }
 
-/* ===== Texto dentro do card ===== */
-.card p {
-  margin: 6px 0;
+.image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== Preço destacado ===== */
+.priceTag {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #e67e22, #d35400);
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* ===== Conteúdo ===== */
+.content {
+  padding: 14px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nome {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+}
+
+.descricao {
+  font-size: 0.9rem;
   color: #555;
-  font-size: 0.95rem;
+  margin: 0;
   line-height: 1.4;
 }
 
-.card strong {
-  color: #222;
+/* ===== Meta Info (quantidade + data) ===== */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: auto;
 }
 
-/* ===== Botão de ação ===== */
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  color: #444;
+}
+
+.icon {
+  color: #e67e22;
+  font-size: 1rem;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* ===== Botão ===== */
 .button {
-  margin-top: 14px;
+  margin: 12px;
   padding: 10px 14px;
   background: linear-gradient(135deg, #e67e22, #d35400);
   color: #fff;
@@ -69,39 +121,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.25s ease;
-  align-self: flex-start;
 }
 
 .button:hover {
   background: linear-gradient(135deg, #d35400, #e67e22);
   transform: scale(1.05);
-}
-
-/* ===== Mensagem quando vazio ===== */
-.empty {
-  text-align: center;
-  color: #888;
-  margin: 40px 0;
-  font-style: italic;
-  font-size: 1rem;
-}
-
-/* ===== Header com título e contador ===== */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px 0 20px;
-}
-
-.title {
-  font-size: 1.6rem;
-  color: #333;
-  font-weight: 700;
-}
-
-.count {
-  font-size: 1rem;
-  color: #e67e22;
-  font-weight: 600;
 }

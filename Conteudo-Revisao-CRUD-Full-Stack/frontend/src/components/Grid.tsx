@@ -31,7 +31,10 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
     <>
       <div className={styles.header}>
         <h2 className={styles.title}>
-          Lista de Produtos <span className={styles.count}>({total} {total === 1 ? "produto" : "produtos"})</span>
+          Lista de Produtos{" "}
+          <span className={styles.count}>
+            ({total} {total === 1 ? "produto" : "produtos"})
+          </span>
         </h2>
       </div>
 
@@ -41,12 +44,30 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
             <h3 className={styles.nome}>
               #{index + 1} — {p.nome}
             </h3>
-            {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className={styles.image} />}
-            <p><strong>Descrição:</strong> {p.descricao}</p>
-            <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
-            <p><strong>Quantidade:</strong> {p.quantidade_estoque}</p>
-            <p><strong>Data de cadastro:</strong> {formatarDataBrasilia(p.data_cadastro)}</p>
-            <button className={styles.button} onClick={() => onDelete(p)}>Excluir</button>
+
+            {p.imagem_url && (
+              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
+            )}
+
+            <div className={styles.details}>
+              <div>
+                <span>Descrição:</span> {p.descricao}
+              </div>
+              <div>
+                <span>Preço:</span> R$ {p.preco.toFixed(2)}
+              </div>
+              <div>
+                <span>Quantidade:</span> {p.quantidade_estoque}
+              </div>
+              <div className={styles.date}>
+                <span>Data de cadastro:</span>{" "}
+                {formatarDataBrasilia(p.data_cadastro)}
+              </div>
+            </div>
+
+            <button className={styles.button} onClick={() => onDelete(p)}>
+              Excluir
+            </button>
           </li>
         ))}
       </ul>

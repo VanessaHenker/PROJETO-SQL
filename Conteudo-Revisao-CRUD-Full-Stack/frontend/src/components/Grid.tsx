@@ -1,7 +1,6 @@
 import React from "react";
 import type { Produto } from "../types/typesSQL";
 import styles from "../styles/grid.module.css";
-import { FaBox } from "react-icons/fa"; 
 
 type GridProps = {
   produtos: Produto[];
@@ -9,41 +8,49 @@ type GridProps = {
 };
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
-  if (produtos.length === 0) {
-    return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+  const total = produtos.length;
+
+  function formatarDataBrasilia(dataISO: string) {
+    const data = new Date(dataISO);
+    const offset = -3;
+    data.setHours(data.getHours() + offset);
+    return data.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
   }
 
+  if (!total) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+
   return (
-    <ul className={styles.grid}>
-      {produtos.map((p) => (
-        <li key={p.produto_id} className={styles.card}>
-          <div className={styles.imageWrapper}>
-            {p.imagem_url && (
-              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
-            )}
-            <span className={styles.priceTag}>R$ {p.preco.toFixed(2)}</span>
-          </div>
+    <>
+      <div className={styles.header}>
+        <h2 className={styles.title}>
+          Lista de Produtos <span className={styles.count}>({total} {total === 1 ? "produto" : "produtos"})</span>
+        </h2>
+      </div>
 
-          <div className={styles.content}>
-            <h3 className={styles.nome}>{p.nome}</h3>
-            <p className={styles.descricao}>{p.descricao}</p>
-
-            <div className={styles.meta}>
-              <span className={styles.qty}>
-                <FaBox className={styles.icon} /> {p.quantidade_estoque}
-              </span>
-              <span className={styles.date}>
-                {new Date(p.data_cadastro).toLocaleString("pt-BR")}
-              </span>
-            </div>
-          </div>
-
-          <button className={styles.button} onClick={() => onDelete(p)}>
-            Excluir
-          </button>
-        </li>
-      ))}
-    </ul>
+      <ul className={styles.grid}>
+        {produtos.map((p, index) => (
+          <li key={p.produto_id} className={styles.card}>
+            <h3 className={styles.nome}>
+              #{index + 1} — {p.nome}
+            </h3>
+            {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className={styles.image} />}
+            <p><strong>Descrição:</strong> {p.descricao}</p>
+            <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
+            <p><strong>Quantidade:</strong> {p.quantidade_estoque}</p>
+            <p><strong>Data de cadastro:</strong> {formatarDataBrasilia(p.data_cadastro)}</p>
+            <button className={styles.button} onClick={() => onDelete(p)}>Excluir</button>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 

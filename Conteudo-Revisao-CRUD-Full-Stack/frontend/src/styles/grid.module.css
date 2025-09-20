@@ -1,6 +1,6 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
   padding: 0;
   list-style: none;
@@ -8,43 +8,91 @@
 
 .card {
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
-.nome {
-  margin: 0 0 10px 0;
-  color: #333;
+.title {
+ font-size: 1rem;         
+  font-weight: 500;           
+  color: #ff7a00;              
+  letter-spacing: 0.5px;   
 }
 
 .image {
   width: 100%;
-  max-height: 180px;
+  height: 160px;
   object-fit: cover;
-  border-radius: 6px;
-  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.nome {
+  margin: 8px 0 0 0;
+  font-size: 1.2rem;       
+  font-weight: 700;      
+  color: #ff7a00;         
+  letter-spacing: 0.5px;  
+  text-transform: capitalize; 
+  text-align: center;
+  
+}
+
+.descricao {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  margin-top: 5px;
+}
+
+.preco {
+  font-weight: 600;
+  color: #222;
+}
+
+.quantidade {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  color: #444;
+}
+
+.data {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: auto; /* joga para o fim do card */
 }
 
 .button {
   margin-top: 10px;
   padding: 8px 12px;
-  background-color: #e74c3c;
+  background-color: #ff7a00;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 500;
   transition: background 0.2s;
 }
 
 .button:hover {
-  background-color: #c0392b;
+  background-color: #e56b00;
 }
 
 .empty {

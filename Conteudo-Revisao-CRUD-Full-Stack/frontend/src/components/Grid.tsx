@@ -1,6 +1,7 @@
 import React from "react";
 import type { Produto } from "../types/typesSQL";
 import styles from "../styles/grid.module.css";
+import { FaBoxOpen } from "react-icons/fa"; // ícone de estoque
 
 type GridProps = {
   produtos: Produto[];
@@ -20,8 +21,6 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
     });
   }
 
@@ -31,22 +30,39 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
     <>
       <div className={styles.header}>
         <h2 className={styles.title}>
-          Lista de Produtos <span className={styles.count}>({total} {total === 1 ? "produto" : "produtos"})</span>
+          Produtos Cadastrados{" "}
+          <span className={styles.count}>{"( "}{total}{" )"}</span>
         </h2>
       </div>
 
       <ul className={styles.grid}>
-        {produtos.map((p, index) => (
+        {produtos.map((p) => (
           <li key={p.produto_id} className={styles.card}>
-            <h3 className={styles.nome}>
-              #{index + 1} — {p.nome}
-            </h3>
-            {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className={styles.image} />}
-            <p><strong>Descrição:</strong> {p.descricao}</p>
-            <p><strong>Preço:</strong> R$ {p.preco.toFixed(2)}</p>
-            <p><strong>Quantidade:</strong> {p.quantidade_estoque}</p>
-            <p><strong>Data de cadastro:</strong> {formatarDataBrasilia(p.data_cadastro)}</p>
-            <button className={styles.button} onClick={() => onDelete(p)}>Excluir</button>
+            {p.imagem_url && (
+              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
+            )}
+
+            <h3 className={styles.nome}>{p.nome}</h3>
+
+            <div className={styles.infoRow}>
+              <span className={styles.preco}>R$ {p.preco.toFixed(2)}</span>
+              <span className={styles.quantidade}>
+                <FaBoxOpen /> {p.quantidade_estoque}
+              </span>
+            </div>
+
+            <p className={styles.descricao}>{p.descricao}</p>
+
+            <span className={styles.data}>
+              {formatarDataBrasilia(p.data_cadastro)}
+            </span>
+
+            <button
+              className={styles.button}
+              onClick={() => onDelete(p)}
+            >
+              Excluir
+            </button>
           </li>
         ))}
       </ul>

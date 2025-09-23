@@ -10,8 +10,8 @@ app.use(express.json());
 
 app.use("/uploads", express.static(path.resolve("uploads")));
 
-app.use("/produtos", productRoutes);
 app.use("/upload", uploadRoutes);
+app.use("/produtos", productRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

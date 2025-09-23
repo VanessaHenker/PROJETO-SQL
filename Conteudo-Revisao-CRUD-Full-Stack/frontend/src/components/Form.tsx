@@ -18,7 +18,10 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // formato MySQL
+    const agora = new Date().toLocaleString("pt-BR", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
+    });
 
     onSubmit({
       nome,
@@ -34,25 +37,6 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     setPreco("");
     setQuantidade("");
     setImagemUrl(null);
-  };
-
-  const handleUpload = async (file: File) => {
-    const formData = new FormData();
-    formData.append("imagem", file);
-
-    try {
-      const res = await fetch("http://localhost:3001/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Erro no upload da imagem");
-
-      const data = await res.json();
-      setImagemUrl(data.imagem_url); // salva o caminho do backend
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   return (
@@ -79,26 +63,13 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
 
       <div className={styles.inputArea}>
         <label>Imagem</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleUpload(file);
-          }}
-          className={styles.inputFile}
-        />
+        <input type="file" accept="image/*" onChange={(e) => {
+          const file = e.target.files?.[0] || null;
+          setImagemUrl(file ? URL.createObjectURL(file) : null);
+        }} className={styles.inputFile}/>
       </div>
 
-      {imagemUrl && (
-        <div className={styles.preview}>
-          <img
-            src={`http://localhost:3001${imagemUrl}`}
-            alt="Pré-visualização"
-            className={styles.previewImg}
-          />
-        </div>
-      )}
+      {imagemUrl && <div className={styles.preview}><img src={imagemUrl} alt="Pré-visualização" className={styles.previewImg}/></div>}
 
       <button type="submit" className={styles.button}>Salvar Produto</button>
     </form>

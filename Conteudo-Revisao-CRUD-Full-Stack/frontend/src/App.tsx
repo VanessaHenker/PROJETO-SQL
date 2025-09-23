@@ -1,79 +1,50 @@
 import React, { useEffect, useState } from "react";
 import Form from "./components/Form";
-import type { ProdutoFormData } from "./components/Form"; 
 import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
-import styles from "./styles/app.module.css";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
-  // Buscar produtos do backend
   const fetchProdutos = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/produtos");
-      if (!res.ok) throw new Error("Erro ao buscar produtos");
-      const data = await res.json();
-      setProdutos(data);
-    } catch (err) {
-      console.error(err);
-    }
+    const res = await fetch(`${API}/produtos`);
+    const data = await res.json();
+    setProdutos(data);
   };
 
   useEffect(() => {
     fetchProdutos();
   }, []);
 
-  // Adicionar produto
-  const addProduto = async (produto: ProdutoFormData) => {
-    try {
-      // Data/hora completa para MySQL
-      const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // YYYY-MM-DD HH:mm:ss
+  const addProduto = async (produtoData: Omit<Produto, "produto_id" | "data_cadastro">) => {
+    // cria data no formato SQL
+    const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const payload = { ...produtoData, data_cadastro: agora };
 
-      const produtoCompleto = {
-        ...produto,
-        descricao: produto.descricao ?? "",
-        quantidade_estoque: produto.quantidade_estoque ?? 0,
-        data_cadastro: agora,
-      };
+    const res = await fetch(`${API}/produtos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-      const res = await fetch("http://localhost:3001/produtos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produtoCompleto),
-      });
+    if (!res.ok) throw new Error("Erro ao salvar produto");
 
-      if (!res.ok) throw new Error("Erro ao salvar produto");
-      const novoProduto = await res.json();
-
-      setProdutos((prev) => [...prev, novoProduto]);
-    } catch (err) {
-      console.error(err);
-    }
+    const novo = await res.json();
+    setProdutos((prev) => [...prev, novo]);
   };
 
-  // Excluir produto
-  const deleteProduto = async (produto: Produto) => {
-    try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Erro ao excluir produto");
-      setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
-    } catch (err) {
-      console.error(err);
-    }
+  const deleteProduto = async (p: Produto) => {
+    const res = await fetch(`${API}/produtos/${p.produto_id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Erro ao excluir");
+    setProdutos((prev) => prev.filter((x) => x.produto_id !== p.produto_id));
   };
 
   return (
-    <div className={styles.app}>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Cadastro de Produtos</h1>
-        <Form onSubmit={addProduto} />
-      </div>
-
-      <div className={styles.container}>
-        <h2 className={styles.subtitle}>Lista de Produtos</h2>
-        <Grid produtos={produtos} onDelete={deleteProduto} />
-      </div>
+    <div>
+      <Form onSubmit={addProduto} />
+      <Grid produtos={produtos} onDelete={deleteProduto} />
     </div>
   );
 };

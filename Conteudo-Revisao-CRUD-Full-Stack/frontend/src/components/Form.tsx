@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../styles/form.module.css";
-import type { Produto } from "../types/typesSQL";
 
-export type ProdutoFormData = Omit<Produto, "produto_id">;
+type ProdutoFormPayload = {
+  nome: string;
+  descricao: string;
+  preco: number;
+  quantidade_estoque: number;
+  imagem_url: string | null;
+};
 
 type FormProps = {
-  onSubmit: (formData: ProdutoFormData) => void | Promise<void>;
+  onSubmit: (formData: ProdutoFormPayload) => void | Promise<void>;
 };
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
@@ -15,100 +22,86 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemFile, setImagemFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    // liberar URL de preview quando desmontar / quando mudar
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let imagemUrl: string | null = null;
+    setUploading(true);
+    let imagem_url: string | null = null;
 
-    // Se houver imagem, faz upload pro backend
-    if (imagemFile) {
-      const formData = new FormData();
-      formData.append("imagem", imagemFile);
+    try {
+      if (imagemFile) {
+        const fd = new FormData();
+        fd.append("imagem", imagemFile);
 
-      const res = await fetch("http://localhost:3001/upload", {
-        method: "POST",
-        body: formData,
-      });
+        const res = await fetch(`${API}/upload`, {
+          method: "POST",
+          body: fd,
+        });
 
-      if (!res.ok) {
-        alert("Erro ao enviar imagem");
-        return;
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`Upload falhou: ${res.status} ${txt}`);
+        }
+
+        const data = await res.json();
+        imagem_url = data.imagem_url ?? null; // ex: "/uploads/165...jpg"
       }
 
-      const data = await res.json();
-      imagemUrl = data.imagem_url; // ex: "/uploads/169543245.png"
+      await onSubmit({
+        nome,
+        descricao,
+        preco: preco === "" ? 0 : Number(preco),
+        quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
+        imagem_url,
+      });
+
+      // reset
+      setNome("");
+      setDescricao("");
+      setPreco("");
+      setQuantidade("");
+      setImagemFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert("Erro ao salvar: " + (err.message || err));
+    } finally {
+      setUploading(false);
     }
-
-    const agora = new Date().toLocaleString("pt-BR", {
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit"
-    });
-
-    await onSubmit({
-      nome,
-      descricao,
-      preco: preco === "" ? 0 : Number(preco),
-      quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: imagemUrl,
-      data_cadastro: agora,
-    });
-
-    // Resetar
-    setNome("");
-    setDescricao("");
-    setPreco("");
-    setQuantidade("");
-    setImagemFile(null);
-    setPreviewUrl(null);
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
         <label>Nome</label>
-        <input
-          type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-          className={styles.input}
-          placeholder="Ex: Bolo de Chocolate"
-        />
+        <input value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} />
       </div>
 
       <div className={styles.inputArea}>
         <label>Descrição</label>
-        <textarea
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          required
-          className={styles.textarea}
-          placeholder="Ex: Bolo fofinho"
-        />
+        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} />
       </div>
 
       <div className={styles.inputArea}>
         <label>Preço (R$)</label>
-        <input
-          type="number"
-          step="0.01"
-          value={preco}
-          onChange={(e) => setPreco(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input} />
       </div>
 
       <div className={styles.inputArea}>
         <label>Quantidade em Estoque</label>
-        <input
-          type="number"
-          value={quantidade}
-          onChange={(e) => setQuantidade(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input} />
       </div>
 
       <div className={styles.inputArea}>
@@ -127,11 +120,13 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
 
       {previewUrl && (
         <div className={styles.preview}>
-          <img src={previewUrl} alt="Pré-visualização" className={styles.previewImg} />
+          <img src={previewUrl} alt="Prévia" className={styles.previewImg} />
         </div>
       )}
 
-      <button type="submit" className={styles.button}>Salvar Produto</button>
+      <button type="submit" className={styles.button} disabled={uploading}>
+        {uploading ? "Enviando..." : "Salvar Produto"}
+      </button>
     </form>
   );
 };

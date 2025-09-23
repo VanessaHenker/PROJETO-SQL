@@ -1,84 +1,57 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "../styles/form.module.css";
+import type { Produto } from "../types/typesSQL";
 
-type ProdutoFormPayload = {
-  nome: string;
-  descricao: string;
-  preco: number;
-  quantidade_estoque: number;
-  imagem_url: string | null;
-};
+export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
-  onSubmit: (formData: ProdutoFormPayload) => void | Promise<void>;
+  onSubmit: (formData: ProdutoFormData) => void | Promise<void>;
 };
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
-  const [imagemFile, setImagemFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [imagemUrl, setImagemUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    // liberar URL de preview quando desmontar / quando mudar
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    setUploading(true);
-    let imagem_url: string | null = null;
+    const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // formato MySQL
+
+    onSubmit({
+      nome,
+      descricao,
+      preco: preco === "" ? 0 : Number(preco),
+      quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
+      imagem_url: imagemUrl,
+      data_cadastro: agora,
+    });
+
+    setNome("");
+    setDescricao("");
+    setPreco("");
+    setQuantidade("");
+    setImagemUrl(null);
+  };
+
+  const handleUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("imagem", file);
 
     try {
-      if (imagemFile) {
-        const fd = new FormData();
-        fd.append("imagem", imagemFile);
-
-        const res = await fetch(`${API}/upload`, {
-          method: "POST",
-          body: fd,
-        });
-
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(`Upload falhou: ${res.status} ${txt}`);
-        }
-
-        const data = await res.json();
-        imagem_url = data.imagem_url ?? null; // ex: "/uploads/165...jpg"
-      }
-
-      await onSubmit({
-        nome,
-        descricao,
-        preco: preco === "" ? 0 : Number(preco),
-        quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-        imagem_url,
+      const res = await fetch("http://localhost:3001/upload", {
+        method: "POST",
+        body: formData,
       });
 
-      // reset
-      setNome("");
-      setDescricao("");
-      setPreco("");
-      setQuantidade("");
-      setImagemFile(null);
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-        setPreviewUrl(null);
-      }
-    } catch (err: any) {
+      if (!res.ok) throw new Error("Erro no upload da imagem");
+
+      const data = await res.json();
+      setImagemUrl(data.imagem_url); // salva o caminho do backend
+    } catch (err) {
       console.error(err);
-      alert("Erro ao salvar: " + (err.message || err));
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -86,22 +59,22 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
         <label>Nome</label>
-        <input value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} />
+        <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} placeholder="Ex: Bolo de Chocolate"/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Descrição</label>
-        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} />
+        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} placeholder="Ex: Bolo fofinho"/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Preço (R$)</label>
-        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input} />
+        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Quantidade em Estoque</label>
-        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input} />
+        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
@@ -110,23 +83,24 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
           type="file"
           accept="image/*"
           onChange={(e) => {
-            const file = e.target.files?.[0] || null;
-            setImagemFile(file);
-            setPreviewUrl(file ? URL.createObjectURL(file) : null);
+            const file = e.target.files?.[0];
+            if (file) handleUpload(file);
           }}
           className={styles.inputFile}
         />
       </div>
 
-      {previewUrl && (
+      {imagemUrl && (
         <div className={styles.preview}>
-          <img src={previewUrl} alt="Prévia" className={styles.previewImg} />
+          <img
+            src={`http://localhost:3001${imagemUrl}`}
+            alt="Pré-visualização"
+            className={styles.previewImg}
+          />
         </div>
       )}
 
-      <button type="submit" className={styles.button} disabled={uploading}>
-        {uploading ? "Enviando..." : "Salvar Produto"}
-      </button>
+      <button type="submit" className={styles.button}>Salvar Produto</button>
     </form>
   );
 };

@@ -27,20 +27,10 @@ const App: React.FC = () => {
   // Adicionar produto
   const addProduto = async (produto: ProdutoFormData) => {
     try {
-      // Data/hora completa para MySQL
-      const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // YYYY-MM-DD HH:mm:ss
-
-      const produtoCompleto = {
-        ...produto,
-        descricao: produto.descricao ?? "",
-        quantidade_estoque: produto.quantidade_estoque ?? 0,
-        data_cadastro: agora,
-      };
-
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produtoCompleto),
+        body: JSON.stringify(produto),
       });
 
       if (!res.ok) throw new Error("Erro ao salvar produto");

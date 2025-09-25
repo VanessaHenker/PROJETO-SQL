@@ -1,27 +1,30 @@
-import { Router, Request, Response } from "express";
+import express from "express";
 import multer from "multer";
 import path from "path";
 
-const router = Router();
+const router = express.Router();
 
-// configuração do multer
+// Configuração de upload
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    cb(null, "uploads/"); // pasta uploads já deve existir
+    cb(null, "uploads/"); // pasta já criada
   },
   filename: (_req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // nome único
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
 const upload = multer({ storage });
 
-// rota de upload
-router.post("/", upload.single("imagem"), (req: Request, res: Response) => {
-  if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado" });
+// Rota para upload
+router.post("/", upload.single("imagem"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "Nenhum arquivo enviado" });
+  }
 
-  // devolve caminho relativo que vai para o banco
-  res.json({ imagem_url: `/uploads/${req.file.filename}` });
+  const fileUrl = `http://localhost:3001/uploads/${req.file.filename}`;
+  res.json({ url: fileUrl });
 });
 
 export default router;

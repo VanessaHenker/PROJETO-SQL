@@ -13,61 +13,47 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
-
-  // Estado para imagem
-  const [file, setFile] = useState<File | null>(null);
+  const [imagem, setImagem] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] || null;
-    setFile(f);
-    setPreview(f ? URL.createObjectURL(f) : null); // preview local
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let uploadedUrl: string | null = null;
+    let imagem_url: string | null = null;
 
-    // Se tiver imagem, envia para backend primeiro
-    if (file) {
+    // 👉 Se o usuário selecionou uma imagem, enviamos primeiro para o backend
+    if (imagem) {
       const formData = new FormData();
-      formData.append("imagem", file);
+      formData.append("imagem", imagem);
 
-      try {
-        const res = await fetch("http://localhost:3001/upload", {
-          method: "POST",
-          body: formData,
-        });
+      const res = await fetch("http://localhost:3001/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          uploadedUrl = data.imagem_url; // exemplo: "/uploads/16956712345.jpg"
-        } else {
-          console.error("Erro ao fazer upload da imagem");
-        }
-      } catch (error) {
-        console.error("Erro na requisição de upload:", error);
+      if (res.ok) {
+        const data = await res.json();
+        imagem_url = data.imagem_url; // caminho que o backend retornou
       }
     }
 
-    const agora = new Date().toISOString();
+    const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // MySQL format
 
-    await onSubmit({
+    onSubmit({
       nome,
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: uploadedUrl,
+      imagem_url,
       data_cadastro: agora,
     });
 
-    // Limpar formulário
+    // reset form
     setNome("");
     setDescricao("");
     setPreco("");
     setQuantidade("");
-    setFile(null);
+    setImagem(null);
     setPreview(null);
   };
 
@@ -75,48 +61,22 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
         <label>Nome</label>
-        <input
-          type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-          className={styles.input}
-          placeholder="Ex: Bolo de Chocolate"
-        />
+        <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} />
       </div>
 
       <div className={styles.inputArea}>
         <label>Descrição</label>
-        <textarea
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          required
-          className={styles.textarea}
-          placeholder="Ex: Bolo fofinho"
-        />
+        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} />
       </div>
 
       <div className={styles.inputArea}>
         <label>Preço (R$)</label>
-        <input
-          type="number"
-          step="0.01"
-          value={preco}
-          onChange={(e) => setPreco(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Quantidade em Estoque</label>
-        <input
-          type="number"
-          value={quantidade}
-          onChange={(e) => setQuantidade(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
@@ -124,21 +84,22 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         <input
           type="file"
           accept="image/*"
-          onChange={handleFileChange}
+          onChange={(e) => {
+            const file = e.target.files?.[0] || null;
+            setImagem(file);
+            setPreview(file ? URL.createObjectURL(file) : null);
+          }}
           className={styles.inputFile}
         />
       </div>
 
-      {/* Preview da imagem */}
       {preview && (
         <div className={styles.preview}>
-          <img src={preview} alt="Pré-visualização" className={styles.previewImg} />
+          <img src={preview} alt="Pré-visualização" className={styles.previewImg}/>
         </div>
       )}
 
-      <button type="submit" className={styles.button}>
-        Salvar Produto
-      </button>
+      <button type="submit" className={styles.button}>Salvar Produto</button>
     </form>
   );
 };

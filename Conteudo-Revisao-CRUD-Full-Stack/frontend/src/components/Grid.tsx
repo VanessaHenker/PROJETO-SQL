@@ -46,6 +46,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
               />
             )}
 
+
             <h3 className={styles.nome}>{p.nome}</h3>
 
             <div className={styles.infoRow}>

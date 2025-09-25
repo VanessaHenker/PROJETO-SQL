@@ -4,24 +4,23 @@ import path from "path";
 
 const router = Router();
 
-// Configuração do Multer para salvar os arquivos na pasta uploads
+// configuração do multer
 const storage = multer.diskStorage({
-  destination: (_req: Request, _file: Express.Multer.File, cb) => {
-    cb(null, "uploads/"); // pasta que você criou
+  destination: (_req, _file, cb) => {
+    cb(null, "uploads/"); // pasta uploads já deve existir
   },
-  filename: (_req: Request, file: Express.Multer.File, cb) => {
-    // Renomeia o arquivo para evitar conflitos: timestamp + extensão original
-    cb(null, Date.now() + path.extname(file.originalname));
+  filename: (_req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // nome único
   },
 });
 
 const upload = multer({ storage });
 
-// Endpoint para upload de imagem
+// rota de upload
 router.post("/", upload.single("imagem"), (req: Request, res: Response) => {
   if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado" });
 
-  // Retorna a URL relativa que pode ser salva no MySQL
+  // devolve caminho relativo que vai para o banco
   res.json({ imagem_url: `/uploads/${req.file.filename}` });
 });
 

@@ -10,9 +10,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// pasta uploads acessível publicamente
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// rotas principais
 app.use("/produtos", productRoutes);
 app.use("/upload", uploadRoutes);
 

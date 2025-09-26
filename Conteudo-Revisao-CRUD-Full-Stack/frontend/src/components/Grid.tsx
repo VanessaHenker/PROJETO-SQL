@@ -35,32 +35,39 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
       </div>
 
       <ul className={styles.grid}>
-        {produtos.map((p) => (
-          <li key={p.produto_id} className={styles.card}>
-            {p.imagem_url && (
-              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
-            )}
+        {produtos.map((p) => {
+          // monta a URL da imagem caso o backend retorne apenas o nome
+          const imageUrl = p.imagem_url?.startsWith("http")
+            ? p.imagem_url
+            : p.imagem_url
+            ? `http://localhost:3001/uploads/${p.imagem_url}`
+            : null;
 
-            <h3 className={styles.nome}>{p.nome}</h3>
+          return (
+            <li key={p.produto_id} className={styles.card}>
+              {imageUrl && <img src={imageUrl} alt={p.nome} className={styles.image} />}
 
-            <div className={styles.infoRow}>
-              <span className={styles.preco}>R$ {p.preco.toFixed(2)}</span>
-              <span className={styles.quantidade}>
-                <FaBoxOpen /> {p.quantidade_estoque}
+              <h3 className={styles.nome}>{p.nome}</h3>
+
+              <div className={styles.infoRow}>
+                <span className={styles.preco}>R$ {p.preco.toFixed(2)}</span>
+                <span className={styles.quantidade}>
+                  <FaBoxOpen /> {p.quantidade_estoque}
+                </span>
+              </div>
+
+              <p className={styles.descricao}>{p.descricao}</p>
+
+              <span className={styles.data}>
+                {formatarDataBrasilia(p.data_cadastro)}
               </span>
-            </div>
 
-            <p className={styles.descricao}>{p.descricao}</p>
-
-            <span className={styles.data}>
-              {formatarDataBrasilia(p.data_cadastro)}
-            </span>
-
-            <button className={styles.button} onClick={() => onDelete(p)}>
-              Excluir
-            </button>
-          </li>
-        ))}
+              <button className={styles.button} onClick={() => onDelete(p)}>
+                Excluir
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </>
   );

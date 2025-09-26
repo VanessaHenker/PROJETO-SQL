@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Form from "./components/Form";
-import type { ProdutoFormData } from "./components/Form";
 import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
 import styles from "./styles/app.module.css";
@@ -23,15 +22,15 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  const addProduto = async (produto: ProdutoFormData) => {
+  const addProduto = async (formData: FormData) => {
     try {
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produto),
+        body: formData, // sem headers, pois é multipart
       });
 
       if (!res.ok) throw new Error("Erro ao salvar produto");
+
       const novoProduto = await res.json();
       setProdutos((prev) => [...prev, novoProduto]);
     } catch (err) {
@@ -41,11 +40,14 @@ const App: React.FC = () => {
 
   const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `http://localhost:3001/produtos/${produto.produto_id}`,
+        { method: "DELETE" }
+      );
       if (!res.ok) throw new Error("Erro ao excluir produto");
-      setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
+      setProdutos((prev) =>
+        prev.filter((p) => p.produto_id !== produto.produto_id)
+      );
     } catch (err) {
       console.error(err);
     }

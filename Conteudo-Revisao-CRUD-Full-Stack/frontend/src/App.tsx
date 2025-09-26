@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Form from "./components/Form";
+import type { ProdutoFormData } from "./components/Form";
 import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
 import styles from "./styles/app.module.css";
@@ -22,12 +23,14 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  const addProduto = async (formData: FormData) => {
+  const addProduto = async (produto: ProdutoFormData) => {
     try {
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(produto),
       });
+
       if (!res.ok) throw new Error("Erro ao salvar produto");
       const novoProduto = await res.json();
       setProdutos((prev) => [...prev, novoProduto]);

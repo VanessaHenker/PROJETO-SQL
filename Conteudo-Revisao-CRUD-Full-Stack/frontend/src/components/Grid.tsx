@@ -9,11 +9,12 @@ type GridProps = {
 };
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
-  if (!produtos.length) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+  const total = produtos.length;
 
   function formatarDataBrasilia(dataISO: string) {
     const data = new Date(dataISO);
-    data.setHours(data.getHours() - 3); // fuso horário Brasil
+    const offset = -3;
+    data.setHours(data.getHours() + offset);
     return data.toLocaleString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
@@ -23,36 +24,43 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
     });
   }
 
+  if (!total) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+
   return (
     <>
       <div className={styles.header}>
         <h2 className={styles.title}>
-          Produtos Cadastrados <span className={styles.count}>({produtos.length})</span>
+          Produtos Cadastrados <span className={styles.count}>( {total} )</span>
         </h2>
       </div>
 
       <ul className={styles.grid}>
-        {produtos.map((p) => {
-          const imageUrl = p.imagem_url ? `http://localhost:3001${p.imagem_url}` : null;
+        {produtos.map((p) => (
+          <li key={p.produto_id} className={styles.card}>
+            {p.imagem_url && (
+              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
+            )}
 
-          return (
-            <li key={p.produto_id} className={styles.card}>
-              {imageUrl && <img src={imageUrl} alt={p.nome} className={styles.image} />}
-              <h3 className={styles.nome}>{p.nome}</h3>
-              <div className={styles.infoRow}>
-                <span className={styles.preco}>R$ {p.preco.toFixed(2)}</span>
-                <span className={styles.quantidade}>
-                  <FaBoxOpen /> {p.quantidade_estoque}
-                </span>
-              </div>
-              <p className={styles.descricao}>{p.descricao}</p>
-              <span className={styles.data}>{formatarDataBrasilia(p.data_cadastro)}</span>
-              <button className={styles.button} onClick={() => onDelete(p)}>
-                Excluir
-              </button>
-            </li>
-          );
-        })}
+            <h3 className={styles.nome}>{p.nome}</h3>
+
+            <div className={styles.infoRow}>
+              <span className={styles.preco}>R$ {p.preco.toFixed(2)}</span>
+              <span className={styles.quantidade}>
+                <FaBoxOpen /> {p.quantidade_estoque}
+              </span>
+            </div>
+
+            <p className={styles.descricao}>{p.descricao}</p>
+
+            <span className={styles.data}>
+              {formatarDataBrasilia(p.data_cadastro)}
+            </span>
+
+            <button className={styles.button} onClick={() => onDelete(p)}>
+              Excluir
+            </button>
+          </li>
+        ))}
       </ul>
     </>
   );

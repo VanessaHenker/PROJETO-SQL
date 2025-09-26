@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { db } from "../database/conexaoSQL.js";
+import { db } from "../database/conexaoSQL.js"; // mantenha .js se usar ESM runtime
 
 // Listar todos os produtos
 export const listarProdutos = async (_req: Request, res: Response) => {
@@ -33,12 +33,16 @@ export const obterProduto = async (req: Request, res: Response) => {
 // Criar novo produto
 export const criarProduto = async (req: Request, res: Response) => {
   try {
-    const { nome, descricao = "", preco = 0, quantidade_estoque = 0 } = req.body;
+    const {
+      nome,
+      descricao = "",          
+      preco = 0,              
+      quantidade_estoque = 0,  
+      data_cadastro = new Date().toISOString().slice(0, 10), // yyyy-mm-dd
+      imagem_url = null
+    } = req.body;
 
     if (!nome) return res.status(400).json({ error: "O nome do produto é obrigatório" });
-
-    const data_cadastro = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
-    const imagem_url = req.file ? `/uploads/${req.file.filename}` : null;
 
     const [result] = await db.execute(
       `INSERT INTO produtos 
@@ -62,11 +66,14 @@ export const atualizarProduto = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
 
-    const { nome, descricao = "", preco = 0, quantidade_estoque = 0 } = req.body;
-    const data_cadastro = new Date().toISOString().slice(0, 10);
-
-    // Se enviou nova imagem -> substitui; senão mantém a existente
-    const imagem_url = req.file ? `/uploads/${req.file.filename}` : req.body.imagem_url || null;
+    const {
+      nome,
+      descricao = "",
+      preco = 0,
+      quantidade_estoque = 0,
+      data_cadastro = new Date().toISOString().slice(0, 10),
+      imagem_url = null
+    } = req.body;
 
     await db.execute(
       `UPDATE produtos 

@@ -23,8 +23,9 @@ router.post("/", upload.single("imagem"), (req, res) => {
     return res.status(400).json({ error: "Nenhum arquivo enviado" });
   }
 
-  const fileUrl = `http://localhost:3001/uploads/${req.file.filename}`;
-  res.json({ url: fileUrl });
+const fileUrl = `http://localhost:3001/uploads/${req.file.filename}`;
+res.json({ imagem_url: fileUrl });
+
 });
 
 export default router;

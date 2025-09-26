@@ -21,7 +21,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
 
     let imagem_url: string | null = null;
 
-    // 👉 Se o usuário selecionou uma imagem, enviamos primeiro para o backend
+    // Envia a imagem para o backend se houver
     if (imagem) {
       const formData = new FormData();
       formData.append("imagem", imagem);
@@ -33,11 +33,13 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
 
       if (res.ok) {
         const data = await res.json();
-        imagem_url = data.imagem_url; // caminho que o backend retornou
+        imagem_url = data.imagem_url; // URL completa retornada pelo backend
+      } else {
+        console.error("Erro ao enviar imagem");
       }
     }
 
-    const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // MySQL format
+    const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     onSubmit({
       nome,
@@ -48,7 +50,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       data_cadastro: agora,
     });
 
-    // reset form
+    // Reset form
     setNome("");
     setDescricao("");
     setPreco("");
@@ -61,22 +63,46 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
         <label>Nome</label>
-        <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} />
+        <input
+          type="text"
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          required
+          className={styles.input}
+        />
       </div>
 
       <div className={styles.inputArea}>
         <label>Descrição</label>
-        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} />
+        <textarea
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          required
+          className={styles.textarea}
+        />
       </div>
 
       <div className={styles.inputArea}>
         <label>Preço (R$)</label>
-        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input}/>
+        <input
+          type="number"
+          step="0.01"
+          value={preco}
+          onChange={(e) => setPreco(e.target.value)}
+          required
+          className={styles.input}
+        />
       </div>
 
       <div className={styles.inputArea}>
         <label>Quantidade em Estoque</label>
-        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input}/>
+        <input
+          type="number"
+          value={quantidade}
+          onChange={(e) => setQuantidade(e.target.value)}
+          required
+          className={styles.input}
+        />
       </div>
 
       <div className={styles.inputArea}>
@@ -93,13 +119,16 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         />
       </div>
 
+      {/* Preview local */}
       {preview && (
         <div className={styles.preview}>
-          <img src={preview} alt="Pré-visualização" className={styles.previewImg}/>
+          <img src={preview} alt="Pré-visualização" className={styles.previewImg} />
         </div>
       )}
 
-      <button type="submit" className={styles.button}>Salvar Produto</button>
+      <button type="submit" className={styles.button}>
+        Salvar Produto
+      </button>
     </form>
   );
 };

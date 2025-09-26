@@ -1,7 +1,7 @@
 import React from "react";
 import type { Produto } from "../types/typesSQL";
 import styles from "../styles/grid.module.css";
-import { FaBoxOpen } from "react-icons/fa"; // ícone de estoque
+import { FaBoxOpen } from "react-icons/fa";
 
 type GridProps = {
   produtos: Produto[];
@@ -30,8 +30,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
     <>
       <div className={styles.header}>
         <h2 className={styles.title}>
-          Produtos Cadastrados{" "}
-          <span className={styles.count}>{"( "}{total}{" )"}</span>
+          Produtos Cadastrados <span className={styles.count}>( {total} )</span>
         </h2>
       </div>
 
@@ -39,13 +38,8 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
         {produtos.map((p) => (
           <li key={p.produto_id} className={styles.card}>
             {p.imagem_url && (
-              <img
-                src={`http://localhost:3001${p.imagem_url}`}
-                alt={p.nome}
-                className={styles.image}
-              />
+              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
             )}
-
 
             <h3 className={styles.nome}>{p.nome}</h3>
 
@@ -62,10 +56,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
               {formatarDataBrasilia(p.data_cadastro)}
             </span>
 
-            <button
-              className={styles.button}
-              onClick={() => onDelete(p)}
-            >
+            <button className={styles.button} onClick={() => onDelete(p)}>
               Excluir
             </button>
           </li>

@@ -1,20 +1,18 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
-
 import productRoutes from "./routes/productRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// pasta uploads acessível publicamente
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+// servir imagens
+app.use("/uploads", express.static(path.resolve("uploads")));
 
+// rotas
 app.use("/produtos", productRoutes);
-app.use("/upload", uploadRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

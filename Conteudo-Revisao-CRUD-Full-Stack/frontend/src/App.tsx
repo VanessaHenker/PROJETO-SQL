@@ -26,11 +26,9 @@ const App: React.FC = () => {
     try {
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
-        body: formData, // sem headers, pois é multipart
+        body: formData,
       });
-
       if (!res.ok) throw new Error("Erro ao salvar produto");
-
       const novoProduto = await res.json();
       setProdutos((prev) => [...prev, novoProduto]);
     } catch (err) {
@@ -40,14 +38,11 @@ const App: React.FC = () => {
 
   const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(
-        `http://localhost:3001/produtos/${produto.produto_id}`,
-        { method: "DELETE" }
-      );
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error("Erro ao excluir produto");
-      setProdutos((prev) =>
-        prev.filter((p) => p.produto_id !== produto.produto_id)
-      );
+      setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
     } catch (err) {
       console.error(err);
     }

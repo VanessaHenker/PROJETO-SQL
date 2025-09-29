@@ -1,13 +1,14 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
+import { db } from "../database/conexaoSQL.js";
 
 const router = express.Router();
 
 // Configuração de upload
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    cb(null, "uploads/"); // pasta já criada
+    cb(null, "uploads/");
   },
   filename: (_req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -17,14 +18,37 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Rota para upload
-router.post("/", upload.single("imagem"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "Nenhum arquivo enviado" });
-  }
+// Criar produto com upload de imagem
+router.post("/", upload.single("imagem"), async (req, res) => {
+  try {
+    const { nome, descricao, preco, quantidade_estoque } = req.body;
 
-  const fileUrl = `http://localhost:3001/uploads/${req.file.filename}`;
-  res.json({ url: fileUrl });
+    const imagem_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const data_cadastro = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    if (!nome) return res.status(400).json({ error: "O nome é obrigatório" });
+
+    const [result] = await db.execute(
+      `INSERT INTO produtos 
+       (nome, descricao, preco, quantidade_estoque, data_cadastro, imagem_url) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [nome, descricao, preco, quantidade_estoque, data_cadastro, imagem_url]
+    );
+
+    const insertId = (result as any).insertId;
+    const [rows] = await db.query(
+      "SELECT * FROM produtos WHERE produto_id = ?",
+      [insertId]
+    );
+
+    res.status(201).json((rows as any[])[0]);
+  } catch (err) {
+    console.error("Erro ao criar produto:", err);
+    res.status(500).json({ error: "Erro ao criar produto" });
+  }
 });
 
 export default router;

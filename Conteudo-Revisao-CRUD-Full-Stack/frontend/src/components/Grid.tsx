@@ -41,7 +41,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
               <img
                 src={`http://localhost:3001${p.imagem_url}`}
                 alt={p.nome}
-                className={styles.image}
+                className={styles.img}
               />
             )}
 

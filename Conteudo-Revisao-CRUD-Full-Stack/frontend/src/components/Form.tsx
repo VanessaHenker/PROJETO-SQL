@@ -19,38 +19,34 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let imagem_url: string | null = null;
-
-    // Envia a imagem para o backend se houver
+    const formData = new FormData();
+    formData.append("nome", nome);
+    formData.append("descricao", descricao);
+    formData.append("preco", preco === "" ? "0" : preco);
+    formData.append(
+      "quantidade_estoque",
+      quantidade === "" ? "0" : quantidade
+    );
     if (imagem) {
-      const formData = new FormData();
       formData.append("imagem", imagem);
-
-      const res = await fetch("http://localhost:3001/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        imagem_url = data.imagem_url; // URL completa retornada pelo backend
-      } else {
-        console.error("Erro ao enviar imagem");
-      }
     }
 
-    const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-    onSubmit({
-      nome,
-      descricao,
-      preco: preco === "" ? 0 : Number(preco),
-      quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url,
-      data_cadastro: agora,
+    const res = await fetch("http://localhost:3001/produtos", {
+      method: "POST",
+      body: formData,
     });
 
-    // Reset form
+    if (!res.ok) {
+      console.error("Erro ao salvar produto");
+      return;
+    }
+
+    const novoProduto = await res.json();
+
+    // Dispara callback para atualizar lista no App
+    onSubmit(novoProduto);
+
+    // Resetar formulário
     setNome("");
     setDescricao("");
     setPreco("");
@@ -119,10 +115,13 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         />
       </div>
 
-      {/* Preview local */}
       {preview && (
         <div className={styles.preview}>
-          <img src={preview} alt="Pré-visualização" className={styles.previewImg} />
+          <img
+            src={preview}
+            alt="Pré-visualização"
+            className={styles.previewImg}
+          />
         </div>
       )}
 

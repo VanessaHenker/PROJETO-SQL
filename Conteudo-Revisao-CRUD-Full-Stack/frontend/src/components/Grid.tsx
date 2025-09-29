@@ -38,7 +38,11 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
         {produtos.map((p) => (
           <li key={p.produto_id} className={styles.card}>
             {p.imagem_url && (
-              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
+              <img
+                src={`http://localhost:3001${p.imagem_url}`}
+                alt={p.nome}
+                className={styles.image}
+              />
             )}
 
             <h3 className={styles.nome}>{p.nome}</h3>

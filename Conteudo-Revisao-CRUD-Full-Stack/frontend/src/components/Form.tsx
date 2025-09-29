@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../styles/form.module.css";
 import type { Produto } from "../types/typesSQL";
 
@@ -16,24 +16,49 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [imagem, setImagem] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("nome", nome);
-    formData.append("descricao", descricao);
-    formData.append("preco", preco === "" ? "0" : preco);
-    formData.append(
-      "quantidade_estoque",
-      quantidade === "" ? "0" : quantidade
-    );
+    let imagem_url = "";
+
+    // Upload de imagem separado
     if (imagem) {
+      const formData = new FormData();
       formData.append("imagem", imagem);
+
+      const resUpload = await fetch("http://localhost:3001/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (resUpload.ok) {
+        const data = await resUpload.json();
+        imagem_url = data.imagem_url;
+      } else {
+        console.error("Erro ao enviar imagem");
+      }
     }
 
+    const produto: ProdutoFormData = {
+      nome,
+      descricao,
+      preco: parseFloat(preco),
+      quantidade_estoque: parseInt(quantidade, 10),
+      imagem_url,
+      data_cadastro: new Date().toISOString(),
+    };
+
+    // Salva no backend
     const res = await fetch("http://localhost:3001/produtos", {
       method: "POST",
-      body: formData,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(produto),
     });
 
     if (!res.ok) {
@@ -43,8 +68,8 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
 
     const novoProduto = await res.json();
 
-    // Dispara callback para atualizar lista no App
-    onSubmit(novoProduto);
+    // Dispara callback
+    await onSubmit(novoProduto);
 
     // Resetar formulário
     setNome("");

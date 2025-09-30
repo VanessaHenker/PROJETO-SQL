@@ -5,7 +5,6 @@ import { db } from "../database/conexaoSQL.js";
 
 const router = express.Router();
 
-// Configuração de upload
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, "uploads/");

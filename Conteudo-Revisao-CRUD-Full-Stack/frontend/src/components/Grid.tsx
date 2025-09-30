@@ -11,17 +11,18 @@ type GridProps = {
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
   const total = produtos.length;
 
+  // Formata data para horário de Brasília
   function formatarDataBrasilia(dataISO: string) {
     const data = new Date(dataISO);
-    const offset = -3;
-    data.setHours(data.getHours() + offset);
-    return data.toLocaleString("pt-BR", {
+    return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    });
+      hour12: false,
+      timeZone: "America/Sao_Paulo",
+    }).format(data);
   }
 
   if (!total) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
@@ -30,20 +31,18 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
     <>
       <div className={styles.header}>
         <h2 className={styles.title}>
-          Produtos Cadastrados <span className={styles.count}>( {total} )</span>
+          Produtos Cadastrados <span className={styles.count}>({total})</span>
         </h2>
       </div>
 
       <ul className={styles.grid}>
         {produtos.map((p) => (
           <li key={p.produto_id} className={styles.card}>
-            {p.imagem_url && (
-              <img
-                src={`http://localhost:3001${p.imagem_url}`}
-                alt={p.nome}
-                className={styles.img}
-              />
-            )}
+            <img
+              src={p.imagem_url ? `http://localhost:3001${p.imagem_url}` : "/placeholder.png"}
+              alt={p.nome}
+              className={styles.img}
+            />
 
             <h3 className={styles.nome}>{p.nome}</h3>
 

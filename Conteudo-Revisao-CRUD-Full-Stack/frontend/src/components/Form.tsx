@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "../styles/form.module.css";
 import type { Produto } from "../types/typesSQL";
 
@@ -13,146 +13,65 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
-  const [imagem, setImagem] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [imagemUrl, setImagemUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (preview) URL.revokeObjectURL(preview);
-    };
-  }, [preview]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    let imagem_url = "";
-
-    // Upload de imagem separado
-    if (imagem) {
-      const formData = new FormData();
-      formData.append("imagem", imagem);
-
-      const resUpload = await fetch("http://localhost:3001/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (resUpload.ok) {
-        const data = await resUpload.json();
-        imagem_url = data.imagem_url;
-      } else {
-        console.error("Erro ao enviar imagem");
-      }
-    }
-
-    const produto: ProdutoFormData = {
-      nome,
-      descricao,
-      preco: parseFloat(preco),
-      quantidade_estoque: parseInt(quantidade, 10),
-      imagem_url,
-      data_cadastro: new Date().toISOString(),
-    };
-
-    // Salva no backend
-    const res = await fetch("http://localhost:3001/produtos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(produto),
+    const agora = new Date().toLocaleString("pt-BR", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
     });
 
-    if (!res.ok) {
-      console.error("Erro ao salvar produto");
-      return;
-    }
+    onSubmit({
+      nome,
+      descricao,
+      preco: preco === "" ? 0 : Number(preco),
+      quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
+      imagem_url: imagemUrl,
+      data_cadastro: agora,
+    });
 
-    const novoProduto = await res.json();
-
-    // Dispara callback
-    await onSubmit(novoProduto);
-
-    // Resetar formulário
     setNome("");
     setDescricao("");
     setPreco("");
     setQuantidade("");
-    setImagem(null);
-    setPreview(null);
+    setImagemUrl(null);
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
         <label>Nome</label>
-        <input
-          type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} placeholder="Ex: Bolo de Chocolate"/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Descrição</label>
-        <textarea
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          required
-          className={styles.textarea}
-        />
+        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} placeholder="Ex: Bolo fofinho"/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Preço (R$)</label>
-        <input
-          type="number"
-          step="0.01"
-          value={preco}
-          onChange={(e) => setPreco(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Quantidade em Estoque</label>
-        <input
-          type="number"
-          value={quantidade}
-          onChange={(e) => setQuantidade(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input}/>
       </div>
 
       <div className={styles.inputArea}>
         <label>Imagem</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0] || null;
-            setImagem(file);
-            setPreview(file ? URL.createObjectURL(file) : null);
-          }}
-          className={styles.inputFile}
-        />
+        <input type="file" accept="image/*" onChange={(e) => {
+          const file = e.target.files?.[0] || null;
+          setImagemUrl(file ? URL.createObjectURL(file) : null);
+        }} className={styles.inputFile}/>
       </div>
 
-      {preview && (
-        <div className={styles.preview}>
-          <img
-            src={preview}
-            alt="Pré-visualização"
-            className={styles.previewImg}
-          />
-        </div>
-      )}
+      {imagemUrl && <div className={styles.preview}><img src={imagemUrl} alt="Pré-visualização" className={styles.previewImg}/></div>}
 
-      <button type="submit" className={styles.button}>
-        Salvar Produto
-      </button>
+      <button type="submit" className={styles.button}>Salvar Produto</button>
     </form>
   );
 };

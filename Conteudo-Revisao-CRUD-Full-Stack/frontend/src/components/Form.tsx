@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "../styles/form.module.css";
 import type { Produto } from "../types/typesSQL";
 
-export type ProdutoFormData = Omit<Produto, "produto_id">;;
+export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
   onSubmit: (formData: ProdutoFormData) => void | Promise<void>;

@@ -2,19 +2,19 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 
-import productRoutes from "./productRoutes.js";
-import uploadRoutes from "./src/uploadRoutes.js"; 
+import productRoutes from "./src/routes/productRoutes";
+import uploadRoutes from "./src/routes/uploadRoutes";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads"))); 
+// Servir imagens da pasta uploads
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/produtos", productRoutes);
-app.use("/upload", uploadRoutes); 
+app.use("/upload", uploadRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

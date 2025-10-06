@@ -10,6 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "src/routes/uploadRoutes.ts", "src/uploads/uploadProdutos.ts", "src/uploads/productRoutes.ts"],
+  "include": ["src/**/*.ts", "src/routes/uploadRoutes.ts", "uploadProdutos.ts", "productRoutes.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { db } from "../database/conexaoSQL.js"; // mantenha .js se usar ESM runtime
+import { db } from "../database/conexaoSQL.js";
 
-// Listar todos os produtos
+// Listar produtos
 export const listarProdutos = async (_req: Request, res: Response) => {
   try {
     const [rows] = await db.query("SELECT * FROM produtos");
     res.json(rows);
   } catch (err) {
-    console.error("Erro ao buscar produtos:", err);
+    console.error(err);
     res.status(500).json({ error: "Erro ao buscar produtos" });
   }
 };
@@ -30,15 +30,15 @@ export const obterProduto = async (req: Request, res: Response) => {
   }
 };
 
-// Criar novo produto
+// Criar produto
 export const criarProduto = async (req: Request, res: Response) => {
   try {
     const {
       nome,
-      descricao = "",          
-      preco = 0,              
-      quantidade_estoque = 0,  
-      data_cadastro = new Date().toISOString().slice(0, 10), // yyyy-mm-dd
+      descricao = "",
+      preco = 0,
+      quantidade_estoque = 0,
+      data_cadastro = new Date().toISOString().slice(0, 10),
       imagem_url = null
     } = req.body;
 
@@ -55,12 +55,12 @@ export const criarProduto = async (req: Request, res: Response) => {
     const [rows] = await db.query("SELECT * FROM produtos WHERE produto_id = ?", [insertId]);
     res.status(201).json((rows as any[])[0]);
   } catch (err) {
-    console.error("Erro ao criar produto:", err);
+    console.error(err);
     res.status(500).json({ error: "Erro ao criar produto" });
   }
 };
 
-// Atualizar produto existente
+// Atualizar produto
 export const atualizarProduto = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -89,7 +89,7 @@ export const atualizarProduto = async (req: Request, res: Response) => {
 
     res.json(produtoAtualizado);
   } catch (err) {
-    console.error("Erro ao atualizar produto:", err);
+    console.error(err);
     res.status(500).json({ error: "Erro ao atualizar produto" });
   }
 };
@@ -103,7 +103,7 @@ export const deletarProduto = async (req: Request, res: Response) => {
     await db.execute("DELETE FROM produtos WHERE produto_id = ?", [id]);
     res.status(204).send();
   } catch (err) {
-    console.error("Erro ao deletar produto:", err);
+    console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });
   }
 };

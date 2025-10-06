@@ -13,10 +13,9 @@ app.use(express.json());
 // Servir imagens da pasta uploads
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+// Rotas
 app.use("/produtos", productRoutes);
 app.use("/upload", uploadRoutes);
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em: http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Servidor rodando em http://localhost:${PORT}`));

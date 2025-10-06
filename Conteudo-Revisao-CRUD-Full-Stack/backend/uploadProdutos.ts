@@ -1,27 +1,23 @@
-import express from "express";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 
-// Configuração do Multer
+// 🔹 Define o destino onde as imagens serão salvas
 const storage = multer.diskStorage({
-  destination: function (_req, _file, cb) {
-    cb(null, "uploads/"); // pasta que você já criou
+  destination: (req, file, cb) => {
+    const dir = path.join(process.cwd(), "src", "uploads");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    cb(null, dir);
   },
-  filename: function (_req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // nome único
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, `${uniqueSuffix}${ext}`);
   },
 });
 
 const upload = multer({ storage });
 
-// Router (ou app diretamente)
-const router = express.Router();
-
-router.post("/upload", upload.single("imagem"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado" });
-
-  // Retorna o caminho relativo que será salvo no MySQL
-  res.json({ imagem_url: `/uploads/${req.file.filename}` });
-});
-
-export default router;
+export default upload;

@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage }); 
 
 // Endpoint para upload de imagem
 router.post("/", upload.single("imagem"), (req: Request, res: Response) => {

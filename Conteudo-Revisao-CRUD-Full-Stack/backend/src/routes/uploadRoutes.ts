@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import upload from "../middleware/upload.js"; // Node ESM exige .js em runtime
+import upload from "../middleware/upload.js"; // .js obrigatório no Node ESM
 
 const router = Router();
 

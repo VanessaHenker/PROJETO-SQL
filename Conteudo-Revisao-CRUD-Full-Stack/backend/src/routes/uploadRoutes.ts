@@ -1,42 +1,38 @@
-import { Router, Request, Response } from "express";
+import express from "express";
 import path from "path";
 import fs from "fs";
-import db from "../database/conexaoSQL.js";
-import upload from "../middleware/upload.js";
+import pool from "../database/conexaoSQL.js";
 
-const router = Router();
+const router = express.Router();
 
-router.post("/", upload.single("imagem"), (req: Request, res: Response) => {
-  if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado" });
-
-  res.json({ imagem_url: `/uploads/${req.file.filename}` });
-});
-
-// exemplo de DELETE se quiser testar exclusão de imagem
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [rows]: any = await db.query("SELECT imagem_url FROM produtos WHERE produto_id = ?", [id]);
-    const produto = rows[0];
+    // Busca o produto antes de deletar
+    const [rows]: any = await pool.query("SELECT imagem_url FROM produtos WHERE produto_id = ?", [id]);
 
-    if (!produto) {
-      return res.status(404).json({ error: "Produto não encontrado" });
+    if (!rows.length) {
+      return res.status(404).json({ message: "Produto não encontrado" });
     }
 
-    if (produto.imagem_url) {
-      const imagePath = path.join(process.cwd(), produto.imagem_url);
-      fs.unlink(imagePath, (err) => {
-        if (err) console.warn("⚠️ Erro ao excluir imagem:", err.message);
-      });
+    const imagemPath = rows[0].imagem_url
+      ? path.join(process.cwd(), rows[0].imagem_url)
+      : null;
+
+    // Deleta do banco
+    await pool.query("DELETE FROM produtos WHERE produto_id = ?", [id]);
+
+    // Deleta a imagem se existir
+    if (imagemPath && fs.existsSync(imagemPath)) {
+      fs.unlinkSync(imagemPath);
+      console.log("🗑️ Imagem excluída:", imagemPath);
     }
 
-    await db.query("DELETE FROM produtos WHERE produto_id = ?", [id]);
-
-    res.json({ message: "Produto e imagem excluídos com sucesso" });
-  } catch (err) {
-    console.error("Erro ao excluir produto:", err);
-    res.status(500).json({ error: "Erro ao excluir produto" });
+    res.json({ message: "Produto e imagem excluídos com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao excluir produto:", error);
+    res.status(500).json({ message: "Erro ao excluir produto" });
   }
 });
 

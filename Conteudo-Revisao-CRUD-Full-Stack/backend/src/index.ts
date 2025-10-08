@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 
-import uploadRoutes from "./routes/uploadRoutes.js";    
-import productRoutes from "./routes/productRoutes.js"; 
+import uploadRoutes from "./routes/uploadRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 
 const app = express();
 
@@ -17,4 +17,8 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/upload", uploadRoutes);
 app.use("/produtos", productRoutes);
 
-app.listen(3001, () => console.log("Servidor rodando na porta 3001"));
+const PORT = 3001;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`🌐 Acesse: http://localhost:${PORT}`);
+});

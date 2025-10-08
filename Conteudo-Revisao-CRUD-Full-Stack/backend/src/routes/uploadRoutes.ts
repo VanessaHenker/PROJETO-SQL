@@ -1,24 +1,29 @@
 import { Router, Request, Response } from "express";
 import path from "path";
 import fs from "fs";
-import pool from "../db.js"; 
+import db from "../database/conexaoSQL.js";
+import upload from "../middleware/upload.js";
 
 const router = Router();
 
-// 🗑️ Excluir produto e imagem
+router.post("/", upload.single("imagem"), (req: Request, res: Response) => {
+  if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado" });
+
+  res.json({ imagem_url: `/uploads/${req.file.filename}` });
+});
+
+// exemplo de DELETE se quiser testar exclusão de imagem
 router.delete("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    // 1. Buscar o produto
-    const [rows] = await pool.query("SELECT imagem_url FROM produtos WHERE produto_id = ?", [id]);
+    const [rows]: any = await db.query("SELECT imagem_url FROM produtos WHERE produto_id = ?", [id]);
     const produto = rows[0];
 
     if (!produto) {
       return res.status(404).json({ error: "Produto não encontrado" });
     }
 
-    // 2. Excluir imagem da pasta
     if (produto.imagem_url) {
       const imagePath = path.join(process.cwd(), produto.imagem_url);
       fs.unlink(imagePath, (err) => {
@@ -26,8 +31,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
       });
     }
 
-    // 3. Excluir o registro do banco
-    await pool.query("DELETE FROM produtos WHERE produto_id = ?", [id]);
+    await db.query("DELETE FROM produtos WHERE produto_id = ?", [id]);
 
     res.json({ message: "Produto e imagem excluídos com sucesso" });
   } catch (err) {

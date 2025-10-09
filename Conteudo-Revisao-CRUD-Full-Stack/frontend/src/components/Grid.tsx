@@ -1,20 +1,20 @@
 import React from "react";
 import type { Produto } from "../types/typesSQL";
 import styles from "../styles/grid.module.css";
-import { FaBoxOpen } from "react-icons/fa";
+import { FaBoxOpen } from "react-icons/fa"; // ícone de estoque
 
-interface GridProps {
+type GridProps = {
   produtos: Produto[];
   onDelete: (produto: Produto) => void;
-}
+};
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
-  if (!produtos.length)
-    return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
+  const total = produtos.length;
 
-  const formatarData = (dataISO?: string) => {
-    if (!dataISO) return "";
+  function formatarDataBrasilia(dataISO: string) {
     const data = new Date(dataISO);
+    const offset = -3;
+    data.setHours(data.getHours() + offset);
     return data.toLocaleString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
@@ -22,51 +22,51 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
+  }
+
+  if (!total) return <p className={styles.empty}>Nenhum produto cadastrado.</p>;
 
   return (
-    <ul className={styles.grid}>
-      {produtos.map((p) => (
-        <li key={p.produto_id} className={styles.card}>
-          {p.imagem_url ? (
-            <img
-              src={`http://localhost:3001${p.imagem_url}`}
-              alt={p.nome}
-              className={styles.image}
-            />
-          ) : (
-            <div className={styles.noImage}>Sem imagem</div>
-          )}
+    <>
+      <div className={styles.header}>
+        <h2 className={styles.title}>
+          Produtos Cadastrados{" "}
+          <span className={styles.count}>{"( "}{total}{" )"}</span>
+        </h2>
+      </div>
 
-          <h3 className={styles.nome}>{p.nome}</h3>
+      <ul className={styles.grid}>
+        {produtos.map((p) => (
+          <li key={p.produto_id} className={styles.card}>
+            {p.imagem_url && (
+              <img src={p.imagem_url} alt={p.nome} className={styles.image} />
+            )}
 
-          <div className={styles.infoRow}>
-            <span className={styles.preco}>
-              R$ {p.preco?.toFixed(2).replace(".", ",")}
-            </span>
-            <span className={styles.quantidade}>
-              <FaBoxOpen /> {p.quantidade_estoque}
-            </span>
-          </div>
+            <h3 className={styles.nome}>{p.nome}</h3>
 
-          {p.descricao && (
+            <div className={styles.infoRow}>
+              <span className={styles.preco}>R$ {p.preco.toFixed(2)}</span>
+              <span className={styles.quantidade}>
+                <FaBoxOpen /> {p.quantidade_estoque}
+              </span>
+            </div>
+
             <p className={styles.descricao}>{p.descricao}</p>
-          )}
 
-          {p.data_cadastro && (
-            <span className={styles.data}>{formatarData(p.data_cadastro)}</span>
-          )}
+            <span className={styles.data}>
+              {formatarDataBrasilia(p.data_cadastro)}
+            </span>
 
-          <button
-            className={styles.button}
-            onClick={() => onDelete(p)}
-            title="Excluir produto e imagem associada"
-          >
-            Excluir
-          </button>
-        </li>
-      ))}
-    </ul>
+            <button
+              className={styles.button}
+              onClick={() => onDelete(p)}
+            >
+              Excluir
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 

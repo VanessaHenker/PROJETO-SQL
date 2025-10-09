@@ -13,65 +13,122 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
-  const [imagemUrl, setImagemUrl] = useState<string | null>(null);
+  const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const agora = new Date().toLocaleString("pt-BR", {
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit"
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
 
-    onSubmit({
+    const formData: ProdutoFormData = {
       nome,
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: imagemUrl,
+      imagem_url: imagemPreview ?? "",
       data_cadastro: agora,
-    });
+    };
 
+    onSubmit(formData);
+
+    // Resetar campos após envio
     setNome("");
     setDescricao("");
     setPreco("");
     setQuantidade("");
-    setImagemUrl(null);
+    setImagemPreview(null);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImagemPreview(file ? URL.createObjectURL(file) : null);
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.inputArea}>
-        <label>Nome</label>
-        <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required className={styles.input} placeholder="Ex: Bolo de Chocolate"/>
+        <label htmlFor="nome">Nome</label>
+        <input
+          id="nome"
+          type="text"
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          required
+          className={styles.input}
+          placeholder="Ex: Bolo de Chocolate"
+        />
       </div>
 
       <div className={styles.inputArea}>
-        <label>Descrição</label>
-        <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required className={styles.textarea} placeholder="Ex: Bolo fofinho"/>
+        <label htmlFor="descricao">Descrição</label>
+        <textarea
+          id="descricao"
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          required
+          className={styles.textarea}
+          placeholder="Ex: Bolo fofinho com cobertura"
+        />
       </div>
 
       <div className={styles.inputArea}>
-        <label>Preço (R$)</label>
-        <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className={styles.input}/>
+        <label htmlFor="preco">Preço (R$)</label>
+        <input
+          id="preco"
+          type="number"
+          step="0.01"
+          min="0"
+          value={preco}
+          onChange={(e) => setPreco(e.target.value)}
+          required
+          className={styles.input}
+        />
       </div>
 
       <div className={styles.inputArea}>
-        <label>Quantidade em Estoque</label>
-        <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required className={styles.input}/>
+        <label htmlFor="quantidade">Quantidade em Estoque</label>
+        <input
+          id="quantidade"
+          type="number"
+          min="0"
+          value={quantidade}
+          onChange={(e) => setQuantidade(e.target.value)}
+          required
+          className={styles.input}
+        />
       </div>
 
       <div className={styles.inputArea}>
-        <label>Imagem</label>
-        <input type="file" accept="image/*" onChange={(e) => {
-          const file = e.target.files?.[0] || null;
-          setImagemUrl(file ? URL.createObjectURL(file) : null);
-        }} className={styles.inputFile}/>
+        <label htmlFor="imagem">Imagem</label>
+        <input
+          id="imagem"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className={styles.inputFile}
+        />
       </div>
 
-      {imagemUrl && <div className={styles.preview}><img src={imagemUrl} alt="Pré-visualização" className={styles.previewImg}/></div>}
+      {imagemPreview && (
+        <div className={styles.preview}>
+          <img
+            src={imagemPreview}
+            alt="Pré-visualização da imagem"
+            className={styles.previewImg}
+          />
+        </div>
+      )}
 
-      <button type="submit" className={styles.button}>Salvar Produto</button>
+      <button type="submit" className={styles.button}>
+        Salvar Produto
+      </button>
     </form>
   );
 };

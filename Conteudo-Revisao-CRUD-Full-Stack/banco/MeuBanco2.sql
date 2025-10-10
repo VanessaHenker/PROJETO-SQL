@@ -1,4 +1,4 @@
--- Active: 1754954648150@@127.0.0.1@3306@phpmyadmin
+-- Active: 1754954648150@@127.0.0.1@3306@mysql
 
 CREATE TABLE produtos (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -9,4 +9,5 @@ CREATE TABLE produtos (
   data_cadastro DATE DEFAULT (CURRENT_DATE),
   imagem_url VARCHAR(255) DEFAULT NULL
 );
-SELECT * FROM produtos;
+/* SELECT * FROM produtos;
+ */

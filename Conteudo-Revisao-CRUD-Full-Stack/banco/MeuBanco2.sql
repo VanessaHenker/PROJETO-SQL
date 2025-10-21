@@ -6,9 +6,6 @@ CREATE TABLE produtos (
   descricao TEXT DEFAULT '',
   preco DECIMAL(10,2) DEFAULT 0,
   quantidade_estoque INT DEFAULT 0,
-  data_cadastro DATE DEFAULT CURRENT_DATE,
+  data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
   imagem_url VARCHAR(255) DEFAULT NULL
 );
-
-/* SELECT * FROM produtos;
- */

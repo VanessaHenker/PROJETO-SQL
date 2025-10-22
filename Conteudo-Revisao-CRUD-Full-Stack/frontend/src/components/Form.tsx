@@ -1,108 +1,116 @@
-import React, { useState } from "react";
-import styles from "../styles/form.module.css";
-import type { Produto } from "../types/typesSQL";
+import { useState } from "react";
 
-export type ProdutoFormData = Omit<Produto, "produto_id">;
-
-type FormProps = {
-  onSubmit: (formData: FormData) => void | Promise<void>;
-};
-
-const Form: React.FC<FormProps> = ({ onSubmit }) => {
+const Form = () => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [imagemFile, setImagemFile] = useState<File | null>(null);
-  const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [produtos, setProdutos] = useState<any[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Buscar produtos
+  const fetchProdutos = async () => {
+    const res = await fetch("http://localhost:3001/produtos");
+    const data = await res.json();
+    setProdutos(data);
+  };
+
+  // Cadastrar produto
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const formData = new FormData();
     formData.append("nome", nome);
     formData.append("descricao", descricao);
-    formData.append("preco", preco || "0");
-    formData.append("quantidade_estoque", quantidade || "0");
+    formData.append("preco", preco);
+    formData.append("quantidade_estoque", quantidade);
     if (imagemFile) formData.append("imagem", imagemFile);
 
-    onSubmit(formData);
+    const res = await fetch("http://localhost:3001/produtos", {
+      method: "POST",
+      body: formData,
+    });
 
-    setNome("");
-    setDescricao("");
-    setPreco("");
-    setQuantidade("");
-    setImagemFile(null);
-    setImagemPreview(null);
+    if (res.ok) {
+      await fetchProdutos();
+      setNome("");
+      setDescricao("");
+      setPreco("");
+      setQuantidade("");
+      setImagemFile(null);
+    } else {
+      alert("Erro ao salvar produto");
+    }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setImagemFile(file);
-    setImagemPreview(file ? URL.createObjectURL(file) : null);
+  // Excluir produto
+  const excluirProduto = async (id: number) => {
+    const res = await fetch(`http://localhost:3001/produtos/${id}`, { method: "DELETE" });
+    if (res.ok) fetchProdutos();
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.inputArea}>
-        <label>Nome</label>
+    <div className="container">
+      <h2>Cadastro de Produtos</h2>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
+          placeholder="Nome"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
-          placeholder="Ex: Bolo de Chocolate"
         />
-      </div>
-
-      <div className={styles.inputArea}>
-        <label>Descrição</label>
         <textarea
+          placeholder="Descrição"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
-          placeholder="Ex: Bolo fofinho com cobertura"
         />
-      </div>
-
-      <div className={styles.inputArea}>
-        <label>Preço (R$)</label>
         <input
           type="number"
-          step="0.01"
-          min="0"
+          placeholder="Preço (R$)"
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
           required
         />
-      </div>
-
-      <div className={styles.inputArea}>
-        <label>Quantidade em Estoque</label>
         <input
           type="number"
-          min="0"
+          placeholder="Quantidade"
           value={quantidade}
           onChange={(e) => setQuantidade(e.target.value)}
-          required
         />
+        <input type="file" onChange={(e) => setImagemFile(e.target.files?.[0] || null)} />
+        <button type="submit">Salvar Produto</button>
+      </form>
+
+      <h3>Lista de Produtos</h3>
+      <div className="grid">
+        {produtos.length === 0 ? (
+          <p>Nenhum produto cadastrado</p>
+        ) : (
+          produtos.map((p) => (
+            <div key={p.produto_id} className="card">
+              <img
+                src={`http://localhost:3001${p.imagem_url}`}
+                alt={p.nome}
+                width="100"
+                height="100"
+              />
+              <h4>{p.nome}</h4>
+              <p>{p.descricao}</p>
+              <p>
+                <strong>R$ {p.preco}</strong>
+              </p>
+              <p>Estoque: {p.quantidade_estoque}</p>
+              <p>Cadastro: {new Date(p.data_cadastro).toLocaleString()}</p>
+              <button onClick={() => excluirProduto(p.produto_id)}>Excluir</button>
+            </div>
+          ))
+        )}
       </div>
-
-      <div className={styles.inputArea}>
-        <label>Imagem</label>
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-      </div>
-
-      {imagemPreview && (
-        <div className={styles.preview}>
-          <img src={imagemPreview} alt="Pré-visualização" />
-        </div>
-      )}
-
-      <button type="submit" className={styles.button}>
-        Salvar Produto
-      </button>
-    </form>
+    </div>
   );
 };
 
 export default Form;
+
+

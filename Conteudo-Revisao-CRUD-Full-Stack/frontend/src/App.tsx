@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Form from "./components/Form";
+import type { ProdutoFormData } from "./components/Form"; 
 import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
 import styles from "./styles/app.module.css";
@@ -7,6 +8,7 @@ import styles from "./styles/app.module.css";
 const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
+  // Buscar produtos do backend
   const fetchProdutos = async () => {
     try {
       const res = await fetch("http://localhost:3001/produtos");
@@ -22,28 +24,39 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  const addProduto = async (formData: FormData) => {
+  // Adicionar produto
+  const addProduto = async (produto: ProdutoFormData) => {
     try {
+      // Data/hora completa para MySQL
+      const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // YYYY-MM-DD HH:mm:ss
+
+      const produtoCompleto = {
+        ...produto,
+        descricao: produto.descricao ?? "",
+        quantidade_estoque: produto.quantidade_estoque ?? 0,
+        data_cadastro: agora,
+      };
+
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(produtoCompleto),
       });
-      if (!res.ok) throw new Error("Erro ao salvar produto");
 
+      if (!res.ok) throw new Error("Erro ao salvar produto");
       const novoProduto = await res.json();
-      setProdutos((prev) => [novoProduto, ...prev]);
+
+      setProdutos((prev) => [...prev, novoProduto]);
     } catch (err) {
       console.error(err);
     }
   };
 
+  // Excluir produto
   const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Erro ao excluir produto");
-
       setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
     } catch (err) {
       console.error(err);

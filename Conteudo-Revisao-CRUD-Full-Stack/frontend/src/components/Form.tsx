@@ -1,116 +1,136 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import styles from "../styles/form.module.css";
+import type { Produto } from "../types/typesSQL";
 
-const Form = () => {
+export type ProdutoFormData = Omit<Produto, "produto_id">;
+
+type FormProps = {
+  onSubmit: (formData: ProdutoFormData) => void | Promise<void>;
+};
+
+const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [preco, setPreco] = useState("");
-  const [quantidade, setQuantidade] = useState("");
-  const [imagemFile, setImagemFile] = useState<File | null>(null);
-  const [produtos, setProdutos] = useState<any[]>([]);
+  const [preco, setPreco] = useState<string>("");
+  const [quantidade, setQuantidade] = useState<string>("");
+  const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
-  // Buscar produtos
-  const fetchProdutos = async () => {
-    const res = await fetch("http://localhost:3001/produtos");
-    const data = await res.json();
-    setProdutos(data);
-  };
-
-  // Cadastrar produto
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("nome", nome);
-    formData.append("descricao", descricao);
-    formData.append("preco", preco);
-    formData.append("quantidade_estoque", quantidade);
-    if (imagemFile) formData.append("imagem", imagemFile);
-
-    const res = await fetch("http://localhost:3001/produtos", {
-      method: "POST",
-      body: formData,
+    const agora = new Date().toLocaleString("pt-BR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
 
-    if (res.ok) {
-      await fetchProdutos();
-      setNome("");
-      setDescricao("");
-      setPreco("");
-      setQuantidade("");
-      setImagemFile(null);
-    } else {
-      alert("Erro ao salvar produto");
-    }
+    const formData: ProdutoFormData = {
+      nome,
+      descricao,
+      preco: preco === "" ? 0 : Number(preco),
+      quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
+      imagem_url: imagemPreview ?? "",
+      data_cadastro: agora,
+    };
+
+    onSubmit(formData);
+
+    // Resetar campos após envio
+    setNome("");
+    setDescricao("");
+    setPreco("");
+    setQuantidade("");
+    setImagemPreview(null);
   };
 
-  // Excluir produto
-  const excluirProduto = async (id: number) => {
-    const res = await fetch(`http://localhost:3001/produtos/${id}`, { method: "DELETE" });
-    if (res.ok) fetchProdutos();
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImagemPreview(file ? URL.createObjectURL(file) : null);
   };
 
   return (
-    <div className="container">
-      <h2>Cadastro de Produtos</h2>
-      <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.inputArea}>
+        <label htmlFor="nome">Nome</label>
         <input
+          id="nome"
           type="text"
-          placeholder="Nome"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
+          className={styles.input}
+          placeholder="Ex: Bolo de Chocolate"
         />
+      </div>
+
+      <div className={styles.inputArea}>
+        <label htmlFor="descricao">Descrição</label>
         <textarea
-          placeholder="Descrição"
+          id="descricao"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
+          required
+          className={styles.textarea}
+          placeholder="Ex: Bolo fofinho com cobertura"
         />
+      </div>
+
+      <div className={styles.inputArea}>
+        <label htmlFor="preco">Preço (R$)</label>
         <input
+          id="preco"
           type="number"
-          placeholder="Preço (R$)"
+          step="0.01"
+          min="0"
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
           required
+          className={styles.input}
         />
+      </div>
+
+      <div className={styles.inputArea}>
+        <label htmlFor="quantidade">Quantidade em Estoque</label>
         <input
+          id="quantidade"
           type="number"
-          placeholder="Quantidade"
+          min="0"
           value={quantidade}
           onChange={(e) => setQuantidade(e.target.value)}
+          required
+          className={styles.input}
         />
-        <input type="file" onChange={(e) => setImagemFile(e.target.files?.[0] || null)} />
-        <button type="submit">Salvar Produto</button>
-      </form>
-
-      <h3>Lista de Produtos</h3>
-      <div className="grid">
-        {produtos.length === 0 ? (
-          <p>Nenhum produto cadastrado</p>
-        ) : (
-          produtos.map((p) => (
-            <div key={p.produto_id} className="card">
-              <img
-                src={`http://localhost:3001${p.imagem_url}`}
-                alt={p.nome}
-                width="100"
-                height="100"
-              />
-              <h4>{p.nome}</h4>
-              <p>{p.descricao}</p>
-              <p>
-                <strong>R$ {p.preco}</strong>
-              </p>
-              <p>Estoque: {p.quantidade_estoque}</p>
-              <p>Cadastro: {new Date(p.data_cadastro).toLocaleString()}</p>
-              <button onClick={() => excluirProduto(p.produto_id)}>Excluir</button>
-            </div>
-          ))
-        )}
       </div>
-    </div>
+
+      <div className={styles.inputArea}>
+        <label htmlFor="imagem">Imagem</label>
+        <input
+          id="imagem"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className={styles.inputFile}
+        />
+      </div>
+
+      {imagemPreview && (
+        <div className={styles.preview}>
+          <img
+            src={imagemPreview}
+            alt="Pré-visualização da imagem"
+            className={styles.previewImg}
+          />
+        </div>
+      )}
+
+      <button type="submit" className={styles.button}>
+        Salvar Produto
+      </button>
+    </form>
   );
 };
 
 export default Form;
-
-

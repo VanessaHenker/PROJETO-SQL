@@ -4,7 +4,6 @@ import fs from "fs";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
-// Cria a pasta uploads se não existir
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
@@ -18,6 +17,15 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      cb(new Error("Apenas arquivos de imagem são permitidos!"));
+    } else {
+      cb(null, true);
+    }
+  },
+});
 
 export default upload;

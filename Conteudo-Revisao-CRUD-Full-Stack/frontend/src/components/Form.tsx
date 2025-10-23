@@ -5,7 +5,7 @@ import type { Produto } from "../types/typesSQL";
 export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
-  onSubmit: (formData: ProdutoFormData) => void | Promise<void>;
+  onSubmit: (formData: ProdutoFormData, imagemFile?: File | null) => void | Promise<void>;
 };
 
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
@@ -14,6 +14,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [imagemFile, setImagemFile] = useState<File | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,26 +29,33 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     });
 
     const formData: ProdutoFormData = {
-      nome,
-      descricao,
+      nome: nome.trim(),
+      descricao: descricao.trim(),
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
       imagem_url: imagemPreview ?? "",
       data_cadastro: agora,
     };
 
-    onSubmit(formData);
+    // 👇 Agora o imagemFile é realmente utilizado
+    if (imagemFile) {
+      console.log("Arquivo selecionado:", imagemFile.name);
+    }
+
+    onSubmit(formData, imagemFile);
 
     // Resetar campos após envio
     setNome("");
     setDescricao("");
     setPreco("");
     setQuantidade("");
+    setImagemFile(null);
     setImagemPreview(null);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+    setImagemFile(file);
     setImagemPreview(file ? URL.createObjectURL(file) : null);
   };
 

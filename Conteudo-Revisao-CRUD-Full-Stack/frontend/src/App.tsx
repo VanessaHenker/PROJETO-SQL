@@ -1,79 +1,68 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Form from "./components/Form";
-import type { ProdutoFormData } from "./components/Form"; 
-import Grid from "./components/Grid";
-import type { Produto } from "./types/typesSQL";
-import styles from "./styles/app.module.css";
+import type { Produto, ProdutoFormData } from "./types/typesSQL";
 
-const App: React.FC = () => {
+const App = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
-  // Buscar produtos do backend
   const fetchProdutos = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/produtos");
-      if (!res.ok) throw new Error("Erro ao buscar produtos");
-      const data = await res.json();
-      setProdutos(data);
-    } catch (err) {
-      console.error(err);
-    }
+    const res = await fetch("http://localhost:3001/produtos");
+    const data = await res.json();
+    setProdutos(data);
   };
 
   useEffect(() => {
     fetchProdutos();
   }, []);
 
-  // Adicionar produto
-  const addProduto = async (produto: ProdutoFormData) => {
+  const handleAddProduto = async (produto: ProdutoFormData) => {
     try {
-      // Data/hora completa para MySQL
-      const agora = new Date().toISOString().slice(0, 19).replace("T", " "); // YYYY-MM-DD HH:mm:ss
-
-      const produtoCompleto = {
-        ...produto,
-        descricao: produto.descricao ?? "",
-        quantidade_estoque: produto.quantidade_estoque ?? 0,
-        data_cadastro: agora,
-      };
+      const formData = new FormData();
+      formData.append("nome", produto.nome);
+      if (produto.descricao) formData.append("descricao", produto.descricao);
+      if (produto.preco !== undefined)
+        formData.append("preco", produto.preco.toString());
+      if (produto.quantidade_estoque !== undefined)
+        formData.append("quantidade_estoque", produto.quantidade_estoque.toString());
+      if (produto.imagem) formData.append("imagem", produto.imagem);
 
       const res = await fetch("http://localhost:3001/produtos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produtoCompleto),
+        body: formData,
       });
 
-      if (!res.ok) throw new Error("Erro ao salvar produto");
-      const novoProduto = await res.json();
+      if (!res.ok) throw new Error("Erro ao cadastrar produto");
 
-      setProdutos((prev) => [...prev, novoProduto]);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Excluir produto
-  const deleteProduto = async (produto: Produto) => {
-    try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Erro ao excluir produto");
-      setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
+      await fetchProdutos();
     } catch (err) {
       console.error(err);
     }
   };
 
   return (
-    <div className={styles.app}>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Cadastro de Produtos</h1>
-        <Form onSubmit={addProduto} />
-      </div>
+    <div>
+      <h1>Cadastro de Produtos</h1>
+      <Form onSubmit={handleAddProduto} />
 
-      <div className={styles.container}>
-        <h2 className={styles.subtitle}>Lista de Produtos</h2>
-        <Grid produtos={produtos} onDelete={deleteProduto} />
-      </div>
+      {produtos.length === 0 ? (
+        <p>Nenhum produto cadastrado</p>
+      ) : (
+        produtos.map((p) => (
+          <div key={p.produto_id}>
+            <h3>{p.nome}</h3>
+            <p>{p.descricao}</p>
+            <p>Preço: R${p.preco}</p>
+            <p>Estoque: {p.quantidade_estoque}</p>
+            {p.imagem_url && (
+              <img
+                src={`http://localhost:3001/${p.imagem_url}`}
+                alt={p.nome}
+                width="150"
+              />
+            )}
+          </div>
+        ))
+      )}
     </div>
   );
 };

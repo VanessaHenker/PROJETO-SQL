@@ -9,51 +9,58 @@ interface GridProps {
 }
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
-  if (!produtos.length)
+  if (!produtos || produtos.length === 0) {
     return (
       <p className={styles.empty}>
         Nenhum produto cadastrado <FaBoxOpen />
       </p>
     );
+  }
 
   return (
-    <div className={styles.grid}>
+    <section className={styles.grid}>
       {produtos.map((p) => (
-        <div key={p.produto_id ?? p.nome} className={styles.card}>
-          <div className={styles.imageArea}>
+        <article key={p.produto_id ?? p.nome} className={styles.card}>
+          <figure className={styles.imageArea}>
             <img
-              src={p.imagem_url ?? ""}
-              alt={p.nome ?? "Produto sem nome"}
+              src={
+                p.imagem_url && p.imagem_url.trim() !== ""
+                  ? p.imagem_url
+                  : "/img/sem-imagem.png"
+              }
+              alt={p.nome || "Produto sem nome"}
               className={styles.image}
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "/img/sem-imagem.png";
+                e.currentTarget.src = "/img/sem-imagem.png";
               }}
             />
-          </div>
+          </figure>
 
           <div className={styles.info}>
-            <h3 className={styles.title}>{p.nome ?? "Sem nome"}</h3>
-            <p className={styles.desc}>{p.descricao ?? "Sem descrição"}</p>
+            <h3 className={styles.title}>{p.nome || "Sem nome"}</h3>
+            <p className={styles.desc}>{p.descricao || "Sem descrição"}</p>
             <p className={styles.price}>
-              Preço: R$ {(p.preco ?? 0).toFixed(2)}
+              💰 <strong>Preço:</strong> R$ {(p.preco ?? 0).toFixed(2)}
             </p>
             <p className={styles.stock}>
-              Estoque: {p.quantidade_estoque ?? 0}
+              📦 <strong>Estoque:</strong> {p.quantidade_estoque ?? 0}
             </p>
             <p className={styles.date}>
-              Cadastrado em: {p.data_cadastro ?? "Data não informada"}
+              🗓️ <strong>Cadastrado em:</strong>{" "}
+              {p.data_cadastro || "Data não informada"}
             </p>
           </div>
 
           <button
             className={styles.deleteBtn}
             onClick={() => onDelete(p)}
+            aria-label={`Excluir produto ${p.nome}`}
           >
             Excluir
           </button>
-        </div>
+        </article>
       ))}
-    </div>
+    </section>
   );
 };
 

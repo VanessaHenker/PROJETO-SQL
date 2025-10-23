@@ -1,18 +1,12 @@
-import express from "express";
-import {
-  listarProdutos,
-  obterProduto,
-  criarProduto,
-  atualizarProduto,
-  deletarProduto,
-} from "../controllers/product.js";
+import { Router } from "express";
+import { listarProdutos, obterProduto, criarProduto, atualizarProduto, deletarProduto } from "../controllers/product.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", listarProdutos);
 router.get("/:id", obterProduto);
 router.post("/", criarProduto);
-router.patch("/:id", atualizarProduto);
+router.put("/:id", atualizarProduto);
 router.delete("/:id", deletarProduto);
 
 export default router;

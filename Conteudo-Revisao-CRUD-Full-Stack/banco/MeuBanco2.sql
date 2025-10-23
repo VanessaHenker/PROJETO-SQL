@@ -8,3 +8,4 @@ CREATE TABLE produtos (
   data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
   imagem_url VARCHAR(255)
 );
+

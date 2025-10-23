@@ -8,4 +8,11 @@ export interface Produto {
   imagem_url?: string;
 }
 
-export type ProdutoFormData = Omit<Produto, "produto_id">;
+// Dados usados no formulário (sem ID e aceitando File)
+export interface ProdutoFormData {
+  nome: string;
+  descricao?: string;
+  preco?: number;
+  quantidade_estoque?: number;
+  imagem?: File | null;
+}

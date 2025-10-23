@@ -5,46 +5,37 @@ import type { Produto } from "../types/typesSQL";
 export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
-  onSubmit: (formData: ProdutoFormData, imagemFile?: File | null) => void | Promise<void>;
+  onSubmit: (formData: FormData) => void | Promise<void>;
 };
 
 const Form: React.FC<FormProps> = ({ onSubmit }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [preco, setPreco] = useState<string>("");
-  const [quantidade, setQuantidade] = useState<string>("");
-  const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [preco, setPreco] = useState("");
+  const [quantidade, setQuantidade] = useState("");
   const [imagemFile, setImagemFile] = useState<File | null>(null);
+  const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const agora = new Date().toLocaleString("pt-BR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
+    const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-    const formData: ProdutoFormData = {
-      nome: nome.trim(),
-      descricao: descricao.trim(),
-      preco: preco === "" ? 0 : Number(preco),
-      quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: imagemPreview ?? "",
-      data_cadastro: agora,
-    };
+    // Criar o objeto FormData para enviar para o backend
+    const formData = new FormData();
+    formData.append("nome", nome);
+    formData.append("descricao", descricao);
+    formData.append("preco", preco || "0");
+    formData.append("quantidade_estoque", quantidade || "0");
+    formData.append("data_cadastro", agora);
 
-    // 👇 Agora o imagemFile é realmente utilizado
     if (imagemFile) {
-      console.log("Arquivo selecionado:", imagemFile.name);
+      formData.append("imagem", imagemFile);
     }
 
-    onSubmit(formData, imagemFile);
+    onSubmit(formData);
 
-    // Resetar campos após envio
+    // Resetar
     setNome("");
     setDescricao("");
     setPreco("");
@@ -69,7 +60,6 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
-          className={styles.input}
           placeholder="Ex: Bolo de Chocolate"
         />
       </div>
@@ -81,7 +71,6 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
           required
-          className={styles.textarea}
           placeholder="Ex: Bolo fofinho com cobertura"
         />
       </div>
@@ -96,7 +85,6 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
           required
-          className={styles.input}
         />
       </div>
 
@@ -109,7 +97,6 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
           value={quantidade}
           onChange={(e) => setQuantidade(e.target.value)}
           required
-          className={styles.input}
         />
       </div>
 
@@ -120,17 +107,12 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          className={styles.inputFile}
         />
       </div>
 
       {imagemPreview && (
         <div className={styles.preview}>
-          <img
-            src={imagemPreview}
-            alt="Pré-visualização da imagem"
-            className={styles.previewImg}
-          />
+          <img src={imagemPreview} alt="Pré-visualização" />
         </div>
       )}
 

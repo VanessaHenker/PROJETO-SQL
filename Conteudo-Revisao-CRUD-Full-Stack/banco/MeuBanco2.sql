@@ -11,3 +11,5 @@
  */
 
  SELECT * FROM produtos ORDER BY produto_id DESC;
+
+CREATE DATABASE meubanco2;

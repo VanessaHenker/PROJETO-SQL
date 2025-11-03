@@ -10,3 +10,14 @@ export const db: Pool = mysql.createPool({
   queueLimit: 0,
   decimalNumbers: true
 });
+
+// Teste de conexão
+(async () => {
+  try {
+    const conn = await db.getConnection();
+    console.log("✅ Conectado ao banco de dados!");
+    conn.release();
+  } catch (err) {
+    console.error("❌ Erro de conexão:", err);
+  }
+})();

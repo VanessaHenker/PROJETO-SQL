@@ -53,7 +53,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
                   hour: "2-digit",
                   minute: "2-digit",
                   second: "2-digit",
-                  hour12: false, // Forçando o formato de 24 horas
+                  hour12: false, 
                 })
               : "Data inválida"}
           </p>

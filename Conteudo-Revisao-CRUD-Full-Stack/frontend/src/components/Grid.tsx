@@ -6,7 +6,7 @@ import { FaBoxOpen, FaTrash, FaDollarSign, FaEdit } from "react-icons/fa";
 interface GridProps {
   produtos: Produto[];
   onDelete: (produto: Produto) => void;
-  onEdit: (produto: Produto) => void; // <-- nova prop para editar
+  onEdit: (produto: Produto) => void; 
 }
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {

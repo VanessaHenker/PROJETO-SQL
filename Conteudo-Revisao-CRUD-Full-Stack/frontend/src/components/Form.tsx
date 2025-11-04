@@ -1,19 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../styles/form.module.css";
 import type { Produto } from "../types/typesSQL";
 
 export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
-  onSubmit: (formData: ProdutoFormData) => void | Promise<void>;
+  onSubmit: (formData: ProdutoFormData, produtoId?: number) => void | Promise<void>;
+  produtoEditando?: Produto | null; // <-- produto a ser editado (opcional)
 };
 
-const Form: React.FC<FormProps> = ({ onSubmit }) => {
+const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+
+  // Preenche os campos automaticamente se for edição
+  useEffect(() => {
+    if (produtoEditando) {
+      setNome(produtoEditando.nome ?? "");
+      setDescricao(produtoEditando.descricao ?? "");
+      setPreco(produtoEditando.preco?.toString() ?? "");
+      setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
+      setImagemPreview(produtoEditando.imagem_url ?? null);
+    } else {
+      // Se não for edição, limpa os campos
+      setNome("");
+      setDescricao("");
+      setPreco("");
+      setQuantidade("");
+      setImagemPreview(null);
+    }
+  }, [produtoEditando]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,17 +52,19 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
       imagem_url: imagemPreview ?? "",
-      data_cadastro: agora,
+      data_cadastro: produtoEditando?.data_cadastro ?? agora, // mantém data original
     };
 
-    onSubmit(formData);
+    onSubmit(formData, produtoEditando?.produto_id);
 
-    // Resetar campos após envio
-    setNome("");
-    setDescricao("");
-    setPreco("");
-    setQuantidade("");
-    setImagemPreview(null);
+    // Opcional: limpar campos após edição
+    // if (!produtoEditando) {
+    //   setNome("");
+    //   setDescricao("");
+    //   setPreco("");
+    //   setQuantidade("");
+    //   setImagemPreview(null);
+    // }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,7 +148,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
       )}
 
       <button type="submit" className={styles.button}>
-        Salvar Produto
+        {produtoEditando ? "Atualizar Produto" : "Salvar Produto"}
       </button>
     </form>
   );

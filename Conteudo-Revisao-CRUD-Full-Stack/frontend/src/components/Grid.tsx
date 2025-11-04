@@ -46,7 +46,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
           <p className={styles.data}>
             Cadastrado em:{" "}
             {p.data_cadastro
-              ? new Date(p.data_cadastro + "Z").toLocaleString("pt-BR", {
+              ? new Date(p.data_cadastro.replace(" ", "T")).toLocaleString("pt-BR", {
                 timeZone: "America/Sao_Paulo",
                 day: "2-digit",
                 month: "2-digit",
@@ -57,7 +57,6 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
                 hour12: false,
               })
               : "Data inválida"}
-
           </p>
 
           <button

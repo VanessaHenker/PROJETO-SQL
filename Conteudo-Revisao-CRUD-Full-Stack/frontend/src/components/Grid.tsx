@@ -46,16 +46,30 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
           <p className={styles.data}>
             Cadastrado em:{" "}
             {p.data_cadastro
-              ? new Date(p.data_cadastro.replace(" ", "T")).toLocaleString("pt-BR", {
-                timeZone: "America/Sao_Paulo",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false,
-              })
+              ? (() => {
+                // Garante conversão de formato MySQL para ISO válido
+                const dataBruta = String(p.data_cadastro).trim();
+                const normalizada = dataBruta.includes("T")
+                  ? dataBruta // já está em formato ISO
+                  : dataBruta.replace(" ", "T"); // converte formato MySQL (YYYY-MM-DD HH:mm:ss)
+
+                // Cria objeto Date e ajusta fuso horário manualmente (-6h)
+                const data = new Date(normalizada);
+                if (isNaN(data.getTime())) return "Data inválida";
+
+                data.setHours(data.getHours() - 6); // ajusta para horário de Brasília
+
+                return data.toLocaleString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
+                });
+              })()
+
               : "Data inválida"}
           </p>
 

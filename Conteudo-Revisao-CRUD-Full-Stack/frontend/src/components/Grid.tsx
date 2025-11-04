@@ -1,14 +1,15 @@
 import React from "react";
 import type { Produto } from "../types/typesSQL";
 import styles from "../styles/grid.module.css";
-import { FaBoxOpen, FaTrash, FaDollarSign } from "react-icons/fa";
+import { FaBoxOpen, FaTrash, FaDollarSign, FaEdit } from "react-icons/fa";
 
 interface GridProps {
   produtos: Produto[];
   onDelete: (produto: Produto) => void;
+  onEdit: (produto: Produto) => void; // <-- nova prop para editar
 }
 
-const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
+const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
   if (!produtos.length)
     return (
       <p className={styles.empty}>
@@ -47,38 +48,42 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete }) => {
             Cadastrado em:{" "}
             {p.data_cadastro
               ? (() => {
-                // Garante conversão de formato MySQL para ISO válido
-                const dataBruta = String(p.data_cadastro).trim();
-                const normalizada = dataBruta.includes("T")
-                  ? dataBruta // já está em formato ISO
-                  : dataBruta.replace(" ", "T"); // converte formato MySQL (YYYY-MM-DD HH:mm:ss)
+                  const dataBruta = String(p.data_cadastro).trim();
+                  const normalizada = dataBruta.includes("T")
+                    ? dataBruta
+                    : dataBruta.replace(" ", "T");
+                  const data = new Date(normalizada);
+                  if (isNaN(data.getTime())) return "Data inválida";
 
-                // Cria objeto Date e ajusta fuso horário manualmente (-6h)
-                const data = new Date(normalizada);
-                if (isNaN(data.getTime())) return "Data inválida";
+                  data.setHours(data.getHours() - 6);
 
-                data.setHours(data.getHours() - 6); // ajusta para horário de Brasília
-
-                return data.toLocaleString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  hour12: false,
-                });
-              })()
-
+                  return data.toLocaleString("pt-BR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                  });
+                })()
               : "Data inválida"}
           </p>
 
-          <button
-            className={styles.button}
-            onClick={() => onDelete(p)}
-          >
-            <FaTrash /> Excluir
-          </button>
+          <div className={styles.buttons}>
+            <button
+              className={`${styles.button} ${styles.editButton}`}
+              onClick={() => onEdit(p)}
+            >
+              <FaEdit /> Editar
+            </button>
+            <button
+              className={`${styles.button} ${styles.deleteButton}`}
+              onClick={() => onDelete(p)}
+            >
+              <FaTrash /> Excluir
+            </button>
+          </div>
         </div>
       ))}
     </div>

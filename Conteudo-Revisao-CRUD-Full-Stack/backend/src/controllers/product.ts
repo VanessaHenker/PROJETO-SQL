@@ -103,7 +103,7 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // 🔹 Busca o produto atualizado
+    // Busca o produto atualizado
     const [rows] = await db.query<Produto[]>(
       "SELECT * FROM produtos WHERE produto_id = ?",
       [id]

@@ -29,7 +29,6 @@ const App: React.FC = () => {
   const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
   try {
     if (produtoId) {
-      // --- EDIÇÃO ---
       const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -39,7 +38,7 @@ const App: React.FC = () => {
       if (!res.ok) throw new Error("Erro ao atualizar produto");
 
       const produtoAtualizado = await res.json();
-      console.log("Produto atualizado recebido do backend:", produtoAtualizado);
+      console.log("Produto atualizado:", produtoAtualizado);
 
       // Atualiza o Grid
       setProdutos(prev =>
@@ -50,29 +49,10 @@ const App: React.FC = () => {
         )
       );
 
-      // Atualiza o Form com os dados atualizados ou limpa
-      setProdutoEditando(produtoAtualizado); // mantém no form
-      // setProdutoEditando(null); // se quiser limpar
+      // Atualiza o Form com os dados atualizados
+      setProdutoEditando(produtoAtualizado); 
     } else {
-      // --- NOVO PRODUTO ---
-      const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
-      const produtoCompleto = {
-        ...formData,
-        descricao: formData.descricao ?? "",
-        quantidade_estoque: formData.quantidade_estoque ?? 0,
-        data_cadastro: agora,
-      };
-
-      const res = await fetch("http://localhost:3001/produtos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(produtoCompleto),
-      });
-
-      if (!res.ok) throw new Error("Erro ao salvar produto");
-      const novoProduto = await res.json();
-
-      setProdutos(prev => [...prev, novoProduto]);
+      // Código para criar novo produto...
     }
   } catch (err) {
     console.error(err);

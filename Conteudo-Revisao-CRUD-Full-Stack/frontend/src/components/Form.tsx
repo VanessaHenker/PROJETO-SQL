@@ -17,22 +17,21 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
   // Preenche os campos automaticamente se for edição
-  useEffect(() => {
-    if (produtoEditando) {
-      setNome(produtoEditando.nome ?? "");
-      setDescricao(produtoEditando.descricao ?? "");
-      setPreco(produtoEditando.preco?.toString() ?? "");
-      setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
-      setImagemPreview(produtoEditando.imagem_url ?? null);
-    } else {
-      // Se não for edição, limpa os campos
-      setNome("");
-      setDescricao("");
-      setPreco("");
-      setQuantidade("");
-      setImagemPreview(null);
-    }
-  }, [produtoEditando]);
+useEffect(() => {
+  if (produtoEditando) {
+    setNome(produtoEditando.nome ?? "");
+    setDescricao(produtoEditando.descricao ?? "");
+    setPreco(produtoEditando.preco?.toString() ?? "");
+    setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
+    setImagemPreview(produtoEditando.imagem_url ?? null);
+  } else {
+    setNome("");
+    setDescricao("");
+    setPreco("");
+    setQuantidade("");
+    setImagemPreview(null);
+  }
+}, [produtoEditando]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

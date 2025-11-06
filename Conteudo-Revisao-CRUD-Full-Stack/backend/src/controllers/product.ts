@@ -102,13 +102,13 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // 🔹 Busca o produto atualizado no banco e o retorna
+    // Busca o produto atualizado e retorna
     const [rows] = await db.query<Produto[]>(
       "SELECT * FROM produtos WHERE produto_id = ?",
       [id]
     );
 
-    res.json(rows[0]);
+    res.json(rows[0]); // retorna o produto completo
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao atualizar produto" });

@@ -90,6 +90,7 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
     const { id } = req.params;
     const { nome, descricao, preco, quantidade_estoque, imagem_url } = req.body;
 
+    // Atualiza o produto
     const [result] = await db.execute<ResultSetHeader>(
       `UPDATE produtos 
        SET nome = ?, descricao = ?, preco = ?, quantidade_estoque = ?, imagem_url = ?
@@ -102,19 +103,18 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Busca o produto atualizado e retorna
+    // 🔹 Busca o produto atualizado
     const [rows] = await db.query<Produto[]>(
       "SELECT * FROM produtos WHERE produto_id = ?",
       [id]
     );
 
-    res.json(rows[0]); // retorna o produto completo
+    res.json(rows[0]); // ✅ retorna o produto completo
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao atualizar produto" });
   }
 };
-
 
 // ==================== DELETAR PRODUTO ====================
 export const deletarProduto = async (req: Request, res: Response): Promise<void> => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Form, { ProdutoFormData } from "./components/Form";
+import Form from "./components/Form";
+import type { ProdutoFormData } from "./components/Form";
 import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
 import styles from "./styles/app.module.css";
@@ -11,11 +12,12 @@ const App: React.FC = () => {
   // Buscar produtos do backend
   const fetchProdutos = async () => {
     try {
-      const response = await fetch("http://localhost:3001/produtos");
-      const data = await response.json();
+      const res = await fetch("http://localhost:3001/produtos");
+      if (!res.ok) throw new Error("Erro ao buscar produtos");
+      const data = await res.json();
       setProdutos(data);
-    } catch (error) {
-      console.error("Erro ao buscar produtos:", error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -23,65 +25,89 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  // Criar ou atualizar produto
+  // Criar ou editar produto
   const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
     try {
       if (produtoId) {
-        // 🔧 EDIÇÃO: PATCH para atualizar o produto
-        const response = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
+        // --- EDIÇÃO ---
+        const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
 
-        if (!response.ok) throw new Error("Erro ao atualizar produto");
-        console.log("Produto atualizado com sucesso!");
+        if (!res.ok) throw new Error("Erro ao atualizar produto");
+        const produtoAtualizado = await res.json();
 
+        setProdutos((prev) =>
+          prev.map((p) =>
+            p.produto_id === produtoAtualizado.produto_id ? produtoAtualizado : p
+          )
+        );
+
+        setProdutoEditando(null); // limpa o estado de edição
       } else {
-        // 🔧 CRIAÇÃO: POST para criar novo produto
-        const response = await fetch("http://localhost:3001/produtos", {
+        // --- NOVO CADASTRO ---
+        const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
+        const produtoCompleto = {
+          ...formData,
+          descricao: formData.descricao ?? "",
+          quantidade_estoque: formData.quantidade_estoque ?? 0,
+          data_cadastro: agora,
+        };
+
+        const res = await fetch("http://localhost:3001/produtos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(produtoCompleto),
         });
 
-        if (!response.ok) throw new Error("Erro ao criar produto");
-        console.log("Produto criado com sucesso!");
-      }
+        if (!res.ok) throw new Error("Erro ao salvar produto");
+        const novoProduto = await res.json();
 
-      // Atualiza lista e limpa edição
-      await fetchProdutos();
-      setProdutoEditando(null);
-    } catch (error) {
-      console.error("Erro no handleSubmit:", error);
+        setProdutos((prev) => [...prev, novoProduto]);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  // Deletar produto
-  const handleDelete = async (produto: Produto) => {
+  // Excluir produto
+  const deleteProduto = async (produto: Produto) => {
     try {
-      const response = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Erro ao excluir produto");
+      const res = await fetch(
+        `http://localhost:3001/produtos/${produto.produto_id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error("Erro ao excluir produto");
 
-      await fetchProdutos();
-    } catch (error) {
-      console.error("Erro ao excluir produto:", error);
+      setProdutos((prev) =>
+        prev.filter((p) => p.produto_id !== produto.produto_id)
+      );
+    } catch (err) {
+      console.error(err);
     }
+  };
+
+  // Entrar em modo de edição
+  const handleEdit = (produto: Produto) => {
+    setProdutoEditando(produto);
+    window.scrollTo({ top: 0, behavior: "smooth" }); // sobe até o form
   };
 
   return (
-    <div className={styles.container}>
-      <h1>Gerenciamento de Produtos</h1>
+    <div className={styles.app}>
+      <div className={styles.container}>
+        <h1 className={styles.title}>
+          {produtoEditando ? "Editar Produto" : "Cadastro de Produtos"}
+        </h1>
+        <Form onSubmit={handleSubmit} produtoEditando={produtoEditando} />
+      </div>
 
-      <Form onSubmit={handleSubmit} produtoEditando={produtoEditando} />
-
-      <Grid
-        produtos={produtos}
-        onDelete={handleDelete}
-        onEdit={(produto) => setProdutoEditando(produto)} // <-- ativa modo edição
-      />
+      <div className={styles.container}>
+        <h2 className={styles.subtitle}>Lista de Produtos</h2>
+        <Grid produtos={produtos} onDelete={deleteProduto} onEdit={handleEdit} />
+      </div>
     </div>
   );
 };

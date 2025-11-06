@@ -27,37 +27,37 @@ const App: React.FC = () => {
 
   // Criar ou editar produto
   const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
-  try {
-    if (produtoId) {
-      const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+    try {
+      if (produtoId) {
+        const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
 
-      if (!res.ok) throw new Error("Erro ao atualizar produto");
+        if (!res.ok) throw new Error("Erro ao atualizar produto");
 
-      const produtoAtualizado = await res.json();
-      console.log("Produto atualizado:", produtoAtualizado);
+        const produtoAtualizado = await res.json();
+        console.log("Produto atualizado:", produtoAtualizado);
 
-      // Atualiza o Grid
-      setProdutos(prev =>
-        prev.map(p =>
-          p.produto_id === Number(produtoAtualizado.produto_id)
-            ? produtoAtualizado
-            : p
-        )
-      );
+        // Atualiza o Grid
+        setProdutos(prev =>
+          prev.map(p =>
+            p.produto_id === Number(produtoAtualizado.produto_id)
+              ? produtoAtualizado
+              : p
+          )
+        );
 
-      // Atualiza o Form com os dados atualizados
-      setProdutoEditando(produtoAtualizado); 
-    } else {
-      // Código para criar novo produto...
+        // Atualiza o Form com os dados atualizados
+        setProdutoEditando(produtoAtualizado);
+      } else {
+        // Código para criar novo produto...
+      }
+    } catch (err) {
+      console.error(err);
     }
-  } catch (err) {
-    console.error(err);
-  }
-};
+  };
 
   // Excluir produto
   const deleteProduto = async (produto: Produto) => {
@@ -78,8 +78,9 @@ const App: React.FC = () => {
 
   // Entrar em modo de edição
   const handleEdit = (produto: Produto) => {
-    setProdutoEditando(produto);
-    window.scrollTo({ top: 0, behavior: "smooth" }); // sobe até o form
+    console.log("Produto para edição:", produto);
+    setProdutoEditando({ ...produto }); // cria nova referência
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

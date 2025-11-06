@@ -27,50 +27,57 @@ const App: React.FC = () => {
 
   // Criar ou editar produto
   const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
-    try {
-      if (produtoId) {
-        // --- EDIÇÃO ---
-        const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
+  try {
+    if (produtoId) {
+      // --- EDIÇÃO ---
+      const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-        if (!res.ok) throw new Error("Erro ao atualizar produto");
-        const produtoAtualizado = await res.json();
+      if (!res.ok) throw new Error("Erro ao atualizar produto");
 
-        setProdutos((prev) =>
-          prev.map((p) =>
-            p.produto_id === produtoAtualizado.produto_id ? produtoAtualizado : p
-          )
-        );
+      const produtoAtualizado = await res.json();
+      console.log("Produto atualizado recebido do backend:", produtoAtualizado);
 
-        setProdutoEditando(null); // limpa o estado de edição
-      } else {
-        // --- NOVO CADASTRO ---
-        const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
-        const produtoCompleto = {
-          ...formData,
-          descricao: formData.descricao ?? "",
-          quantidade_estoque: formData.quantidade_estoque ?? 0,
-          data_cadastro: agora,
-        };
+      // Atualiza o Grid
+      setProdutos(prev =>
+        prev.map(p =>
+          p.produto_id === Number(produtoAtualizado.produto_id)
+            ? produtoAtualizado
+            : p
+        )
+      );
 
-        const res = await fetch("http://localhost:3001/produtos", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(produtoCompleto),
-        });
+      // Atualiza o Form com os dados atualizados ou limpa
+      setProdutoEditando(produtoAtualizado); // mantém no form
+      // setProdutoEditando(null); // se quiser limpar
+    } else {
+      // --- NOVO PRODUTO ---
+      const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
+      const produtoCompleto = {
+        ...formData,
+        descricao: formData.descricao ?? "",
+        quantidade_estoque: formData.quantidade_estoque ?? 0,
+        data_cadastro: agora,
+      };
 
-        if (!res.ok) throw new Error("Erro ao salvar produto");
-        const novoProduto = await res.json();
+      const res = await fetch("http://localhost:3001/produtos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(produtoCompleto),
+      });
 
-        setProdutos((prev) => [...prev, novoProduto]);
-      }
-    } catch (err) {
-      console.error(err);
+      if (!res.ok) throw new Error("Erro ao salvar produto");
+      const novoProduto = await res.json();
+
+      setProdutos(prev => [...prev, novoProduto]);
     }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // Excluir produto
   const deleteProduto = async (produto: Produto) => {

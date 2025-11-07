@@ -9,7 +9,7 @@ const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produtoEditando, setProdutoEditando] = useState<Produto | null>(null);
 
-  // Buscar produtos do backend
+  // ================= BUSCAR PRODUTOS =================
   const fetchProdutos = async () => {
     try {
       const res = await fetch("http://localhost:3001/produtos");
@@ -25,10 +25,16 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  // Criar ou editar produto
-  const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
+  // ================= SALVAR OU ATUALIZAR =================
+ const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
+  console.log("Chamou handleSubmit:", formData, produtoId);
+  if (!produtoId) {
+  console.log("Tentando criar produto novo:", formData);
+}
+
   try {
     if (produtoId) {
+      // ======== EDITAR PRODUTO ========
       const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -40,26 +46,36 @@ const App: React.FC = () => {
       const produtoAtualizado = await res.json();
       console.log("Produto atualizado:", produtoAtualizado);
 
-      // Atualiza o Grid
-      setProdutos(prev =>
-        prev.map(p =>
+      setProdutos((prev) =>
+        prev.map((p) =>
           p.produto_id === Number(produtoAtualizado.produto_id)
             ? produtoAtualizado
             : p
         )
       );
 
-      // Atualiza o Form com os dados atualizados
-      setProdutoEditando(produtoAtualizado); 
+      setProdutoEditando(null);
     } else {
-      // Código para criar novo produto...
+      // ======== CRIAR NOVO PRODUTO ========
+      const res = await fetch("http://localhost:3001/produtos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) throw new Error("Erro ao criar produto");
+
+      const novoProduto = await res.json();
+      console.log("Produto criado:", novoProduto);
+
+      setProdutos((prev) => [novoProduto, ...prev]);
     }
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao salvar produto:", err);
   }
 };
 
-  // Excluir produto
+  // ================= EXCLUIR PRODUTO =================
   const deleteProduto = async (produto: Produto) => {
     try {
       const res = await fetch(
@@ -76,10 +92,10 @@ const App: React.FC = () => {
     }
   };
 
-  // Entrar em modo de edição
+  // ================= EDITAR PRODUTO =================
   const handleEdit = (produto: Produto) => {
     setProdutoEditando(produto);
-    window.scrollTo({ top: 0, behavior: "smooth" }); // sobe até o form
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

@@ -26,7 +26,12 @@ const App: React.FC = () => {
   }, []);
 
   // ================= SALVAR OU ATUALIZAR =================
-  const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
+ const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
+  console.log("Chamou handleSubmit:", formData, produtoId);
+  if (!produtoId) {
+  console.log("Tentando criar produto novo:", formData);
+}
+
   try {
     if (produtoId) {
       // ======== EDITAR PRODUTO ========
@@ -69,7 +74,6 @@ const App: React.FC = () => {
     console.error("Erro ao salvar produto:", err);
   }
 };
-
 
   // ================= EXCLUIR PRODUTO =================
   const deleteProduto = async (produto: Produto) => {

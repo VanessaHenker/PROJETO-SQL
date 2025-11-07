@@ -9,7 +9,7 @@ const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produtoEditando, setProdutoEditando] = useState<Produto | null>(null);
 
-  // Buscar produtos do backend
+  // ================= BUSCAR PRODUTOS =================
   const fetchProdutos = async () => {
     try {
       const res = await fetch("http://localhost:3001/produtos");
@@ -25,11 +25,11 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  // Criar ou editar produto
- const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
+  // ================= SALVAR OU ATUALIZAR =================
+  const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
   try {
     if (produtoId) {
-      // ======== ATUALIZAR PRODUTO EXISTENTE ========
+      // ======== EDITAR PRODUTO ========
       const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -41,7 +41,6 @@ const App: React.FC = () => {
       const produtoAtualizado = await res.json();
       console.log("Produto atualizado:", produtoAtualizado);
 
-      // Atualiza a lista no grid
       setProdutos((prev) =>
         prev.map((p) =>
           p.produto_id === Number(produtoAtualizado.produto_id)
@@ -50,7 +49,6 @@ const App: React.FC = () => {
         )
       );
 
-      // ✅ Limpa o formulário e volta ao modo de cadastro
       setProdutoEditando(null);
     } else {
       // ======== CRIAR NOVO PRODUTO ========
@@ -65,7 +63,6 @@ const App: React.FC = () => {
       const novoProduto = await res.json();
       console.log("Produto criado:", novoProduto);
 
-      // Atualiza o grid com o novo produto no topo
       setProdutos((prev) => [novoProduto, ...prev]);
     }
   } catch (err) {
@@ -73,10 +70,27 @@ const App: React.FC = () => {
   }
 };
 
-  // Entrar em modo de edição
+
+  // ================= EXCLUIR PRODUTO =================
+  const deleteProduto = async (produto: Produto) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/produtos/${produto.produto_id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error("Erro ao excluir produto");
+
+      setProdutos((prev) =>
+        prev.filter((p) => p.produto_id !== produto.produto_id)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ================= EDITAR PRODUTO =================
   const handleEdit = (produto: Produto) => {
-    console.log("Produto para edição:", produto);
-    setProdutoEditando({ ...produto }); // cria nova referência
+    setProdutoEditando(produto);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

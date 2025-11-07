@@ -17,22 +17,21 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
   // Preenche os campos automaticamente se for edição
-  useEffect(() => {
-    if (produtoEditando) {
-      setNome(produtoEditando.nome ?? "");
-      setDescricao(produtoEditando.descricao ?? "");
-      setPreco(produtoEditando.preco?.toString() ?? "");
-      setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
-      setImagemPreview(produtoEditando.imagem_url ?? null);
-    } else {
-      setNome("");
-      setDescricao("");
-      setPreco("");
-      setQuantidade("");
-      setImagemPreview(null);
-    }
-  }, [produtoEditando]);
-
+useEffect(() => {
+  if (produtoEditando) {
+    setNome(produtoEditando.nome ?? "");
+    setDescricao(produtoEditando.descricao ?? "");
+    setPreco(produtoEditando.preco?.toString() ?? "");
+    setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
+    setImagemPreview(produtoEditando.imagem_url ?? null);
+  } else {
+    setNome("");
+    setDescricao("");
+    setPreco("");
+    setQuantidade("");
+    setImagemPreview(null);
+  }
+}, [produtoEditando]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,14 +50,20 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: produtoEditando?.imagem_url ?? "", // <<< alterado aqui
-      data_cadastro: produtoEditando?.data_cadastro ?? agora,
+      imagem_url: imagemPreview ?? "",
+      data_cadastro: produtoEditando?.data_cadastro ?? agora, // mantém data original
     };
-
 
     onSubmit(formData, produtoEditando?.produto_id);
 
-
+    // Opcional: limpar campos após edição
+    // if (!produtoEditando) {
+    //   setNome("");
+    //   setDescricao("");
+    //   setPreco("");
+    //   setQuantidade("");
+    //   setImagemPreview(null);
+    // }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

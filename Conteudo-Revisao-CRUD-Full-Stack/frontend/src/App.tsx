@@ -50,7 +50,7 @@ const App: React.FC = () => {
         );
 
         // Atualiza o Form com os dados atualizados
-        setProdutoEditando(produtoAtualizado);
+        setProdutoEditando({ ...produtoAtualizado });
       } else {
         // Código para criar novo produto...
       }

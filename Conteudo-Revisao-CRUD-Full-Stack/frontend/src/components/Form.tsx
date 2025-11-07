@@ -56,15 +56,8 @@ useEffect(() => {
     };
 
     onSubmit(formData, produtoEditando?.produto_id);
-
-    // Opcional: limpar campos após edição
-    // if (!produtoEditando) {
-    //   setNome("");
-    //   setDescricao("");
-    //   setPreco("");
-    //   setQuantidade("");
-    //   setImagemPreview(null);
-    // }
+    
+  
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -63,6 +63,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
+          className={styles.input}
           placeholder="Ex: Bolo de Chocolate"
         />
       </div>
@@ -74,6 +75,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
           required
+          className={styles.textarea}
           placeholder="Ex: Bolo fofinho com cobertura"
         />
       </div>
@@ -88,6 +90,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
           required
+          className={styles.input}
         />
       </div>
 
@@ -100,6 +103,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={quantidade}
           onChange={(e) => setQuantidade(e.target.value)}
           required
+          className={styles.input}
         />
       </div>
 
@@ -110,16 +114,21 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           type="file"
           accept="image/*"
           onChange={handleImageChange}
+          className={styles.inputFile}
         />
       </div>
 
       {imagemPreview && (
         <div className={styles.preview}>
-          <img src={imagemPreview} alt="Preview" className={styles.previewImg} />
+          <img
+            src={imagemPreview}
+            alt="Pré-visualização da imagem"
+            className={styles.previewImg}
+          />
         </div>
       )}
 
-      <button type="submit">
+      <button type="submit" className={styles.button}>
         {produtoEditando ? "Atualizar Produto" : "Salvar Produto"}
       </button>
     </form>

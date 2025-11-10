@@ -43,7 +43,7 @@ const DataCadastro: React.FC<{ data_cadastro?: string }> = ({ data_cadastro }) =
           : [0, 0, 0];
 
         // Cria a data local sem usar UTC
-        const dataLocal = new Date(ano, mes, dia -1, hora -3, minuto, segundo);
+        const dataLocal = new Date(ano, mes -1, dia, hora -3, minuto, segundo);
 
         // Ajusta para horário de Brasília (UTC-3)
         dataLocal.setHours(dataLocal.getHours() - 3);

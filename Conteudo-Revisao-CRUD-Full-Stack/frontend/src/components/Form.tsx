@@ -16,6 +16,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
+  // Preenche os campos quando seleciona produto para edição
   useEffect(() => {
     if (produtoEditando) {
       setNome(produtoEditando.nome ?? "");
@@ -35,15 +36,13 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const agora = new Date().toISOString(); // data padrão caso seja novo produto
-
     const formData: ProdutoFormData = {
       nome,
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
       imagem_url: imagemPreview ?? produtoEditando?.imagem_url ?? "",
-      data_cadastro: produtoEditando?.data_cadastro ?? agora,
+      data_cadastro: produtoEditando?.data_cadastro ?? new Date().toISOString(),
     };
 
     onSubmit(formData, produtoEditando?.produto_id);
@@ -51,7 +50,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setImagemPreview(file ? URL.createObjectURL(file) : produtoEditando?.imagem_url ?? null);
+    setImagemPreview(file ? URL.createObjectURL(file) : null);
   };
 
   return (
@@ -64,7 +63,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
-          className={styles.input}
           placeholder="Ex: Bolo de Chocolate"
         />
       </div>
@@ -76,7 +74,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
           required
-          className={styles.textarea}
           placeholder="Ex: Bolo fofinho com cobertura"
         />
       </div>
@@ -91,7 +88,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
           required
-          className={styles.input}
         />
       </div>
 
@@ -104,7 +100,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           value={quantidade}
           onChange={(e) => setQuantidade(e.target.value)}
           required
-          className={styles.input}
         />
       </div>
 
@@ -115,21 +110,16 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          className={styles.inputFile}
         />
       </div>
 
       {imagemPreview && (
         <div className={styles.preview}>
-          <img
-            src={imagemPreview}
-            alt="Pré-visualização da imagem"
-            className={styles.previewImg}
-          />
+          <img src={imagemPreview} alt="Preview" className={styles.previewImg} />
         </div>
       )}
 
-      <button type="submit" className={styles.button}>
+      <button type="submit">
         {produtoEditando ? "Atualizar Produto" : "Salvar Produto"}
       </button>
     </form>

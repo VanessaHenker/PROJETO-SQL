@@ -6,7 +6,7 @@ export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
   onSubmit: (formData: ProdutoFormData, produtoId?: number) => void | Promise<void>;
-  produtoEditando?: Produto | null; // <-- produto a ser editado (opcional)
+  produtoEditando?: Produto | null;
 };
 
 const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
@@ -16,7 +16,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
-  // Preenche os campos automaticamente se for edição
   useEffect(() => {
     if (produtoEditando) {
       setNome(produtoEditando.nome ?? "");
@@ -33,37 +32,26 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
     }
   }, [produtoEditando]);
 
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const agora = new Date().toLocaleString("pt-BR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
+    const agora = new Date().toISOString(); // data padrão caso seja novo produto
 
     const formData: ProdutoFormData = {
       nome,
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: produtoEditando?.imagem_url ?? "", // <<< alterado aqui
+      imagem_url: imagemPreview ?? produtoEditando?.imagem_url ?? "",
       data_cadastro: produtoEditando?.data_cadastro ?? agora,
     };
 
-
     onSubmit(formData, produtoEditando?.produto_id);
-
-
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setImagemPreview(file ? URL.createObjectURL(file) : null);
+    setImagemPreview(file ? URL.createObjectURL(file) : produtoEditando?.imagem_url ?? null);
   };
 
   return (

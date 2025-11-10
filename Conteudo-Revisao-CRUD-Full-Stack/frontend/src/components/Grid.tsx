@@ -6,7 +6,7 @@ import { FaBoxOpen, FaTrash, FaDollarSign, FaEdit } from "react-icons/fa";
 interface GridProps {
   produtos: Produto[];
   onDelete: (produto: Produto) => void;
-  onEdit: (produto: Produto) => void; 
+  onEdit: (produto: Produto) => void;
 }
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
@@ -21,6 +21,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
     <div className={styles.grid}>
       {produtos.map((p) => (
         <div key={p.produto_id ?? p.nome} className={styles.card}>
+          {/* Área da imagem */}
           <div className={styles.imageArea}>
             <img
               src={p.imagem_url ?? ""}
@@ -32,9 +33,11 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
             />
           </div>
 
+          {/* Nome e descrição */}
           <h3 className={styles.nome}>{p.nome ?? "Sem nome"}</h3>
           <p className={styles.descricao}>{p.descricao ?? "Sem descrição"}</p>
 
+          {/* Informações de preço e estoque */}
           <div className={styles.infoRow}>
             <span className={styles.preco}>
               <FaDollarSign /> R$ {(p.preco ?? 0).toFixed(2)}
@@ -44,32 +47,47 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
             </span>
           </div>
 
+          {/* Data de cadastro corrigida */}
           <p className={styles.data}>
             Cadastrado em:{" "}
             {p.data_cadastro
               ? (() => {
-                  const dataBruta = String(p.data_cadastro).trim();
-                  const normalizada = dataBruta.includes("T")
-                    ? dataBruta
-                    : dataBruta.replace(" ", "T");
-                  const data = new Date(normalizada);
-                  if (isNaN(data.getTime())) return "Data inválida";
+                  try {
+                    let dataStr = String(p.data_cadastro).trim();
 
-                  data.setHours(data.getHours() - 6);
+                    // Corrige formato caso venha como "YYYY-MM-DD HH:mm:ss"
+                    if (!dataStr.includes("T")) {
+                      dataStr = dataStr.replace(" ", "T");
+                    }
 
-                  return data.toLocaleString("pt-BR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false,
-                  });
+                    // Evita UTC forçado
+                    if (dataStr.endsWith("Z")) {
+                      dataStr = dataStr.slice(0, -1);
+                    }
+
+                    const data = new Date(dataStr);
+
+                    if (isNaN(data.getTime())) return "Data inválida";
+
+                    // Exibe em formato brasileiro e horário local
+                    return data.toLocaleString("pt-BR", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                      hour12: false,
+                      timeZone: "America/Sao_Paulo",
+                    });
+                  } catch {
+                    return "Data inválida";
+                  }
                 })()
               : "Data inválida"}
           </p>
 
+          {/* Botões */}
           <div className={styles.buttons}>
             <button
               className={`${styles.button} ${styles.editButton}`}

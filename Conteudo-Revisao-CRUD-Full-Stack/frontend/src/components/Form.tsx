@@ -16,7 +16,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
-  // Preenche os campos quando seleciona produto para edição
   useEffect(() => {
     if (produtoEditando) {
       setNome(produtoEditando.nome ?? "");
@@ -36,13 +35,15 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const agora = new Date().toISOString();
+
     const formData: ProdutoFormData = {
       nome,
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: imagemPreview ?? produtoEditando?.imagem_url ?? "",
-      data_cadastro: produtoEditando?.data_cadastro ?? new Date().toISOString(),
+      imagem_url: imagemPreview ?? "",
+      data_cadastro: produtoEditando?.data_cadastro ?? agora,
     };
 
     onSubmit(formData, produtoEditando?.produto_id);
@@ -64,7 +65,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           onChange={(e) => setNome(e.target.value)}
           required
           className={styles.input}
-          placeholder="Ex: Bolo de Chocolate"
         />
       </div>
 
@@ -76,17 +76,14 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
           onChange={(e) => setDescricao(e.target.value)}
           required
           className={styles.textarea}
-          placeholder="Ex: Bolo fofinho com cobertura"
         />
       </div>
 
       <div className={styles.inputArea}>
-        <label htmlFor="preco">Preço (R$)</label>
+        <label htmlFor="preco">Preço</label>
         <input
           id="preco"
           type="number"
-          step="0.01"
-          min="0"
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
           required
@@ -95,11 +92,10 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       </div>
 
       <div className={styles.inputArea}>
-        <label htmlFor="quantidade">Quantidade em Estoque</label>
+        <label htmlFor="quantidade">Quantidade</label>
         <input
           id="quantidade"
           type="number"
-          min="0"
           value={quantidade}
           onChange={(e) => setQuantidade(e.target.value)}
           required
@@ -120,11 +116,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
 
       {imagemPreview && (
         <div className={styles.preview}>
-          <img
-            src={imagemPreview}
-            alt="Pré-visualização da imagem"
-            className={styles.previewImg}
-          />
+          <img src={imagemPreview} alt="Pré-visualização" className={styles.previewImg} />
         </div>
       )}
 

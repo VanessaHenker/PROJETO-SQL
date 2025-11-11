@@ -9,14 +9,15 @@ const App: React.FC = () => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produtoEditando, setProdutoEditando] = useState<Produto | null>(null);
 
-  // Buscar produtos do backend
+  // ================= BUSCAR PRODUTOS =================
   const fetchProdutos = async () => {
     try {
       const res = await fetch("http://localhost:3001/produtos");
-      const data = await res.json();
+      if (!res.ok) throw new Error("Erro ao buscar produtos");
+      const data: Produto[] = await res.json();
       setProdutos(data);
     } catch (err) {
-      console.error("Erro ao buscar produtos:", err);
+      console.error(err);
     }
   };
 
@@ -24,53 +25,62 @@ const App: React.FC = () => {
     fetchProdutos();
   }, []);
 
-  // Criar ou atualizar produto
+  // ================= SALVAR OU ATUALIZAR =================
   const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
     try {
       if (produtoId) {
-        // Atualizar produto
+        // UPDATE real no MySQL via backend
         const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
-          method: "PATCH",
+          method: "PUT", // usar PUT para MySQL real
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
-        const produtoAtualizado = await res.json();
 
+        if (!res.ok) throw new Error("Erro ao atualizar produto");
+
+        const produtoAtualizado: Produto = await res.json();
+
+        // Atualiza o estado do grid
         setProdutos((prev) =>
           prev.map((p) =>
-            p.produto_id === produtoAtualizado.produto_id
-              ? produtoAtualizado
-              : p
+            p.produto_id === produtoAtualizado.produto_id ? produtoAtualizado : p
           )
         );
 
         setProdutoEditando(null);
       } else {
-        // Criar produto
+        // CREATE
         const res = await fetch("http://localhost:3001/produtos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
-        const novoProduto = await res.json();
+        if (!res.ok) throw new Error("Erro ao criar produto");
+
+        const novoProduto: Produto = await res.json();
         setProdutos((prev) => [novoProduto, ...prev]);
       }
     } catch (err) {
-      console.error("Erro ao salvar produto:", err);
+      console.error(err);
     }
   };
 
-  // Excluir produto
+
+  // ================= EXCLUIR PRODUTO =================
   const deleteProduto = async (produto: Produto) => {
     try {
-      await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
-      setProdutos((prev) => prev.filter((p) => p.produto_id !== produto.produto_id));
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Erro ao excluir produto");
+
+      setProdutos((prev) =>
+        prev.filter((p) => p.produto_id !== produto.produto_id)
+      );
     } catch (err) {
-      console.error("Erro ao excluir produto:", err);
+      console.error(err);
     }
   };
 
-  // Editar produto
+  // ================= EDITAR PRODUTO =================
   const handleEdit = (produto: Produto) => {
     setProdutoEditando(produto);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -79,12 +89,14 @@ const App: React.FC = () => {
   return (
     <div className={styles.app}>
       <div className={styles.container}>
-        <h1>{produtoEditando ? "Editar Produto" : "Cadastro de Produtos"}</h1>
+        <h1 className={styles.title}>
+          {produtoEditando ? "Editar Produto" : "Cadastro de Produtos"}
+        </h1>
         <Form onSubmit={handleSubmit} produtoEditando={produtoEditando} />
       </div>
 
       <div className={styles.container}>
-        <h2>Lista de Produtos</h2>
+        <h2 className={styles.subtitle}>Lista de Produtos</h2>
         <Grid produtos={produtos} onDelete={deleteProduto} onEdit={handleEdit} />
       </div>
     </div>

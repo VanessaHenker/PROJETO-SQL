@@ -20,26 +20,38 @@ const DataCadastro: React.FC<{ data_cadastro?: string }> = ({ data_cadastro }) =
 
     const atualizarHora = () => {
       try {
+        if (!data_cadastro) {
+          setHoraAtual("Data inválida");
+          return;
+        }
+
         let dataStr = String(data_cadastro).trim();
         dataStr = dataStr.replace("Z", "").split(".")[0];
-        if (dataStr.includes(" ") && !dataStr.includes("T")) dataStr = dataStr.replace(" ", "T");
+        if (dataStr.includes(" ") && !dataStr.includes("T"))
+          dataStr = dataStr.replace(" ", "T");
 
         const [parteData, parteHora] = dataStr.split("T");
         const [ano, mes, dia] = parteData.split("-").map(Number);
-        const [hora = 0, minuto = 0, segundo = 0] = parteHora ? parteHora.split(":").map(Number) : [0,0,0];
+        const [hora = 0, minuto = 0, segundo = 0] = parteHora
+          ? parteHora.split(":").map(Number)
+          : [0, 0, 0];
 
+        // 🟠 Criar data no fuso local, sem UTC (correção real)
         const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, segundo);
 
         setHoraAtual(
-          `${String(dataLocal.getDate()).padStart(2, "0")}/${
-            String(dataLocal.getMonth() + 1).padStart(2, "0")
-          }/${dataLocal.getFullYear()}, ${String(dataLocal.getHours()).padStart(2,"0")}:${String(dataLocal.getMinutes()).padStart(2,"0")}:${String(dataLocal.getSeconds()).padStart(2,"0")}`
+          `${String(dataLocal.getDate()).padStart(2, "0")}/${String(dataLocal.getMonth() + 1).padStart(2, "0")
+          }/${dataLocal.getFullYear()}, ${String(dataLocal.getHours()).padStart(
+            2,
+            "0"
+          )}:${String(dataLocal.getMinutes()).padStart(2, "0")}:${String(
+            dataLocal.getSeconds()
+          ).padStart(2, "0")}`
         );
       } catch {
         setHoraAtual("Data inválida");
       }
     };
-
     atualizarHora();
     const interval = setInterval(atualizarHora, 1000);
     return () => clearInterval(interval);

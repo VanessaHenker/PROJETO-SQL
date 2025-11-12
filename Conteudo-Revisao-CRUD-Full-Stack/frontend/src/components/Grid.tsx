@@ -18,64 +18,53 @@ const DataCadastro: React.FC<{ data_cadastro?: string }> = ({ data_cadastro }) =
       return;
     }
 
-    const atualizarHora = () => {
-      try {
-        if (!data_cadastro) {
-          setHoraAtual("Data inválida");
-          return;
-        }
+    try {
+      let dataStr = String(data_cadastro).trim();
+      dataStr = dataStr.replace("Z", "").split(".")[0];
+      if (dataStr.includes(" ") && !dataStr.includes("T"))
+        dataStr = dataStr.replace(" ", "T");
 
-        let dataStr = String(data_cadastro).trim();
-        dataStr = dataStr.replace("Z", "").split(".")[0];
-        if (dataStr.includes(" ") && !dataStr.includes("T"))
-          dataStr = dataStr.replace(" ", "T");
+      const dataOriginal = new Date(dataStr);
 
-        const [parteData, parteHora] = dataStr.split("T");
-        const [ano, mes, dia] = parteData.split("-").map(Number);
-        const [hora = 0, minuto = 0, segundo = 0] = parteHora
-          ? parteHora.split(":").map(Number)
-          : [0, 0, 0];
+      // 🕒 Subtrair 3 horas (corrige fuso UTC -> Brasil)
+      const dataCorrigida = new Date(dataOriginal.getTime() - 6 * 60 * 60 * 1000);
 
-        // 🟠 Criar data no fuso local, sem UTC (correção real)
-        const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, segundo);
+      const formatado = `${String(dataCorrigida.getDate()).padStart(2, "0")}/${String(
+        dataCorrigida.getMonth() + 1
+      ).padStart(2, "0")}/${dataCorrigida.getFullYear()}, ${String(
+        dataCorrigida.getHours()
+      ).padStart(2, "0")}:${String(dataCorrigida.getMinutes()).padStart(
+        2,
+        "0"
+      )}:${String(dataCorrigida.getSeconds()).padStart(2, "0")}`;
 
-        setHoraAtual(
-          `${String(dataLocal.getDate()).padStart(2, "0")}/${String(dataLocal.getMonth() + 1).padStart(2, "0")
-          }/${dataLocal.getFullYear()}, ${String(dataLocal.getHours()).padStart(
-            2,
-            "0"
-          )}:${String(dataLocal.getMinutes()).padStart(2, "0")}:${String(
-            dataLocal.getSeconds()
-          ).padStart(2, "0")}`
-        );
-      } catch {
-        setHoraAtual("Data inválida");
-      }
-    };
-    atualizarHora();
-    const interval = setInterval(atualizarHora, 1000);
-    return () => clearInterval(interval);
+      setHoraAtual(formatado);
+    } catch {
+      setHoraAtual("Data inválida");
+    }
   }, [data_cadastro]);
 
   return <p className={styles.data}>Cadastrado em: {horaAtual}</p>;
 };
 
 const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
-  if (!produtos.length)
+  if (!produtos.length) {
     return (
       <p className={styles.empty}>
         Nenhum produto cadastrado <FaBoxOpen />
       </p>
     );
+  }
 
   return (
     <div className={styles.grid}>
-      {produtos.map((p) => (
-        <div key={p.produto_id} className={styles.card}>
+      {produtos.map((produto) => (
+        <div key={produto.produto_id} className={styles.card}>
+          {/* Imagem do produto */}
           <div className={styles.imageArea}>
             <img
-              src={p.imagem_url || "/img/sem-imagem.png"}
-              alt={p.nome || "Produto sem nome"}
+              src={produto.imagem_url || "/img/sem-imagem.png"}
+              alt={produto.nome || "Produto sem nome"}
               className={styles.image}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = "/img/sem-imagem.png";
@@ -83,32 +72,36 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
             />
           </div>
 
-          <h3 className={styles.nome}>{p.nome || "Sem nome"}</h3>
-          <p className={styles.descricao}>{p.descricao || "Sem descrição"}</p>
+          {/* Nome e descrição */}
+          <h3 className={styles.nome}>{produto.nome || "Sem nome"}</h3>
+          <p className={styles.descricao}>{produto.descricao || "Sem descrição"}</p>
 
+          {/* Preço e estoque */}
           <div className={styles.infoRow}>
             <span className={styles.preco}>
-              <FaDollarSign /> R$ {(p.preco ?? 0).toFixed(2)}
+              <FaDollarSign /> R$ {(produto.preco ?? 0).toFixed(2)}
             </span>
             <span className={styles.quantidade}>
-              <FaBoxOpen /> {p.quantidade_estoque ?? 0} em estoque
+              <FaBoxOpen /> {produto.quantidade_estoque ?? 0} em estoque
             </span>
           </div>
 
-          <DataCadastro data_cadastro={p.data_cadastro} />
+          {/* Data de cadastro */}
+          <DataCadastro data_cadastro={produto.data_cadastro} />
 
+          {/* Botões */}
           <div className={styles.buttons}>
             <button
               type="button"
               className={`${styles.button} ${styles.editButton}`}
-              onClick={() => onEdit(p)}
+              onClick={() => onEdit(produto)}
             >
               <FaEdit /> Editar
             </button>
             <button
-              type="button"
+              type="button"  
               className={`${styles.button} ${styles.deleteButton}`}
-              onClick={() => onDelete(p)}
+              onClick={() => onDelete(produto)}
             >
               <FaTrash /> Excluir
             </button>

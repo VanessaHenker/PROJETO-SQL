@@ -4,22 +4,21 @@ import styles from "../styles/grid.module.css";
 import { FaBoxOpen, FaTrash, FaDollarSign, FaEdit, FaClock } from "react-icons/fa";
 
 // -----------------------------
-// Componente para exibir data de cadastro + hora oficial de Brasília
+// Componente para exibir data de cadastro (fixa, sem relógio)
 // -----------------------------
 const DataCadastro: React.FC<{ data_cadastro?: string }> = ({ data_cadastro }) => {
-  const [horaOficial, setHoraOficial] = React.useState("Carregando...");
-  const [dataProduto, setDataProduto] = React.useState("Data inválida");
-
-  // Atualiza data de cadastro do produto
-  React.useEffect(() => {
-    if (!data_cadastro) return;
-
+  // Formata a data do produto para o padrão brasileiro
+  const formatarData = (dataStr?: string) => {
+    if (!dataStr) return "Data não informada";
     try {
-      let dataStr = String(data_cadastro).trim();
-      dataStr = dataStr.replace("Z", "").split(".")[0];
-      if (dataStr.includes(" ") && !dataStr.includes("T")) dataStr = dataStr.replace(" ", "T");
+      let dataFormatada = dataStr.trim();
+      dataFormatada = dataFormatada.replace("Z", "").split(".")[0];
+      if (dataFormatada.includes(" ") && !dataFormatada.includes("T"))
+        dataFormatada = dataFormatada.replace(" ", "T");
 
-      const data = new Date(dataStr);
+      const data = new Date(dataFormatada);
+      if (isNaN(data.getTime())) return "Data inválida";
+
       const dia = String(data.getDate()).padStart(2, "0");
       const mes = String(data.getMonth() + 1).padStart(2, "0");
       const ano = data.getFullYear();
@@ -27,45 +26,16 @@ const DataCadastro: React.FC<{ data_cadastro?: string }> = ({ data_cadastro }) =
       const minuto = String(data.getMinutes()).padStart(2, "0");
       const segundo = String(data.getSeconds()).padStart(2, "0");
 
-      setDataProduto(`${dia}/${mes}/${ano}, ${hora}:${minuto}:${segundo}`);
+      return `${dia}/${mes}/${ano}, ${hora}:${minuto}:${segundo}`;
     } catch {
-      setDataProduto("Data inválida");
+      return "Erro ao formatar data";
     }
-  }, [data_cadastro]);
-
-  // Atualiza hora oficial de Brasília a cada segundo
-  React.useEffect(() => {
-    const fetchHora = async () => {
-      try {
-        const res = await fetch("https://worldtimeapi.org/api/timezone/America/Sao_Paulo");
-        const data = await res.json();
-        const date = new Date(data.datetime);
-
-        const dia = String(date.getDate()).padStart(2, "0");
-        const mes = String(date.getMonth() + 1).padStart(2, "0");
-        const ano = date.getFullYear();
-        const hora = String(date.getHours()).padStart(2, "0");
-        const minuto = String(date.getMinutes()).padStart(2, "0");
-        const segundo = String(date.getSeconds()).padStart(2, "0");
-
-        setHoraOficial(`${dia}/${mes}/${ano}, ${hora}:${minuto}:${segundo}`);
-      } catch {
-        setHoraOficial("Erro ao carregar hora oficial");
-      }
-    };
-
-    fetchHora();
-    const interval = setInterval(fetchHora, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  };
 
   return (
     <div className={styles.dataArea}>
       <p className={styles.data}>
-        <FaClock /> Cadastrado em: {dataProduto}
-      </p>
-      <p className={styles.horaOficial}>
-        ⏱️ Hora oficial (Brasília): {horaOficial}
+        <FaClock /> Cadastrado em: {formatarData(data_cadastro)}
       </p>
     </div>
   );
@@ -118,7 +88,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
             </span>
           </div>
 
-          {/* Data e hora oficial */}
+          {/* Data de cadastro */}
           <DataCadastro data_cadastro={p.data_cadastro} />
 
           {/* Botões */}

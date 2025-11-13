@@ -3,7 +3,7 @@ import cors from "cors";
 import path from "path";
 
 import productRoutes from "./routes/productRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";;
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 const app = express();
 
@@ -17,11 +17,13 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/produtos", productRoutes);
 app.use("/upload", uploadRoutes);
 
-// ✅ Rota padrão — evita o erro "Cannot GET /"
+// Rota padrão
 app.get("/", (_req, res) => {
   res.send("API rodando corretamente! 🚀");
 });
 
 // Porta
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`🚀 Servidor rodando em http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`)
+);

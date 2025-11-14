@@ -5,7 +5,7 @@ import type { Produto } from "../types/typesSQL";
 export type ProdutoFormData = Omit<Produto, "produto_id">;
 
 type FormProps = {
-  onSubmit: (formData: ProdutoFormData, produtoId?: number, novaImagem?: File | null) => void | Promise<void>;
+  onSubmit: (formData: ProdutoFormData, produtoId?: number) => void | Promise<void>;
   produtoEditando?: Produto | null;
 };
 
@@ -16,48 +16,22 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
 
-  // 👇 Arquivo REAL da imagem
-  const [novaImagem, setNovaImagem] = useState<File | null>(null);
-
-  // -----------------------
-  // Carregar dados ao editar
-  // -----------------------
   useEffect(() => {
     if (produtoEditando) {
       setNome(produtoEditando.nome ?? "");
       setDescricao(produtoEditando.descricao ?? "");
       setPreco(produtoEditando.preco?.toString() ?? "");
       setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
-
-      // 👇 Sempre usar URL REAL salva no banco
-      setImagemPreview(produtoEditando.imagem_url || null);
-
-      setNovaImagem(null); // evita envios indevidos
+      setImagemPreview(produtoEditando.imagem_url ?? null);
     } else {
       setNome("");
       setDescricao("");
       setPreco("");
       setQuantidade("");
       setImagemPreview(null);
-      setNovaImagem(null);
     }
   }, [produtoEditando]);
 
-  // -----------------------
-  // Preview da imagem sem salvar blob no banco
-  // -----------------------
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-
-    if (file) {
-      setNovaImagem(file); // arquivo real para upload
-      setImagemPreview(URL.createObjectURL(file)); // preview temporário
-    }
-  };
-
-  // -----------------------
-  // Enviar dados corrigidos
-  // -----------------------
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -68,16 +42,16 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-
-      // 👇 NÃO SALVA BLOB! Mantém URL real existente
-      imagem_url: produtoEditando?.imagem_url ?? "",
-
-      // se for edição preserva a data original
+      imagem_url: imagemPreview ?? "",
       data_cadastro: produtoEditando?.data_cadastro ?? agora,
     };
 
-    // Se tiver nova imagem, envia junto
-    onSubmit(formData, produtoEditando?.produto_id, novaImagem);
+    onSubmit(formData, produtoEditando?.produto_id);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImagemPreview(file ? URL.createObjectURL(file) : null);
   };
 
   return (
@@ -142,11 +116,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
 
       {imagemPreview && (
         <div className={styles.preview}>
-          <img
-            src={imagemPreview}
-            alt="Pré-visualização"
-            className={styles.previewImg}
-          />
+          <img src={imagemPreview} alt="Pré-visualização" className={styles.previewImg} />
         </div>
       )}
 

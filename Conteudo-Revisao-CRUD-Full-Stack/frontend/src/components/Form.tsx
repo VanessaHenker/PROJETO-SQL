@@ -14,9 +14,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
-
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
-  const [imagemFile, setImagemFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (produtoEditando) {
@@ -25,35 +23,17 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       setPreco(produtoEditando.preco?.toString() ?? "");
       setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
       setImagemPreview(produtoEditando.imagem_url ?? null);
-      setImagemFile(null);
     } else {
       setNome("");
       setDescricao("");
       setPreco("");
       setQuantidade("");
       setImagemPreview(null);
-      setImagemFile(null);
     }
   }, [produtoEditando]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    let imagem_url = produtoEditando?.imagem_url ?? "";
-
-    // Se enviou imagem nova → fazer upload
-    if (imagemFile) {
-      const data = new FormData();
-      data.append("imagem", imagemFile);
-
-      const uploadResponse = await fetch("http://localhost:3000/upload", {
-        method: "POST",
-        body: data,
-      });
-
-      const result = await uploadResponse.json();
-      imagem_url = result.imagem_url; // Ex: "/uploads/xyzw123.png"
-    }
 
     const agora = new Date().toISOString();
 
@@ -62,16 +42,15 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url,
+      imagem_url: imagemPreview ?? "",
       data_cadastro: produtoEditando?.data_cadastro ?? agora,
     };
 
-    await onSubmit(formData, produtoEditando?.produto_id);
+    onSubmit(formData, produtoEditando?.produto_id);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setImagemFile(file);
     setImagemPreview(file ? URL.createObjectURL(file) : null);
   };
 

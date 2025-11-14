@@ -17,7 +17,7 @@ const App: React.FC = () => {
       const data: Produto[] = await res.json();
       setProdutos(data);
     } catch (err) {
-      console.error(err);
+      console.error("Erro ao carregar produtos:", err);
     }
   };
 
@@ -29,21 +29,28 @@ const App: React.FC = () => {
   const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
     try {
       if (produtoId) {
-        // UPDATE real no MySQL via backend
+        // UPDATE no MySQL
         const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
-          method: "PUT", // usar PUT para MySQL real
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            produto_id: produtoId, // O MySQL PRECISA disso
+            ...formData,
+          }),
         });
 
         if (!res.ok) throw new Error("Erro ao atualizar produto");
 
         const produtoAtualizado: Produto = await res.json();
 
-        // Atualiza o estado do grid
+        // Atualiza lista
         setProdutos((prev) =>
           prev.map((p) =>
-            p.produto_id === produtoAtualizado.produto_id ? produtoAtualizado : p
+            p.produto_id === produtoAtualizado.produto_id
+              ? produtoAtualizado
+              : p
           )
         );
 
@@ -55,28 +62,35 @@ const App: React.FC = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
+
         if (!res.ok) throw new Error("Erro ao criar produto");
 
         const novoProduto: Produto = await res.json();
+
         setProdutos((prev) => [novoProduto, ...prev]);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Erro ao salvar produto:", err);
     }
   };
-
 
   // ================= EXCLUIR PRODUTO =================
   const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
+      const res = await fetch(
+        `http://localhost:3001/produtos/${produto.produto_id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
       if (!res.ok) throw new Error("Erro ao excluir produto");
 
       setProdutos((prev) =>
         prev.filter((p) => p.produto_id !== produto.produto_id)
       );
     } catch (err) {
-      console.error(err);
+      console.error("Erro ao excluir produto:", err);
     }
   };
 
@@ -92,12 +106,21 @@ const App: React.FC = () => {
         <h1 className={styles.title}>
           {produtoEditando ? "Editar Produto" : "Cadastro de Produtos"}
         </h1>
-        <Form onSubmit={handleSubmit} produtoEditando={produtoEditando} />
+
+        <Form
+          onSubmit={handleSubmit}
+          produtoEditando={produtoEditando}
+        />
       </div>
 
       <div className={styles.container}>
         <h2 className={styles.subtitle}>Lista de Produtos</h2>
-        <Grid produtos={produtos} onDelete={deleteProduto} onEdit={handleEdit} />
+
+        <Grid
+          produtos={produtos}
+          onDelete={deleteProduto}
+          onEdit={handleEdit}
+        />
       </div>
     </div>
   );

@@ -49,14 +49,14 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
     onSubmit(formData, produtoEditando?.produto_id);
   };
 
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // preview local
+    // preview local imediato
     setImagemPreview(URL.createObjectURL(file));
 
-    // envia para o servidor
     const formData = new FormData();
     formData.append("imagem", file);
 
@@ -66,16 +66,15 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Erro ao enviar imagem");
-
       const data = await response.json();
 
-      // salva URL real gerada pelo servidor
-      setImagemPreview(data.imagem_url);
-    } catch (error) {
-      console.error("Erro no upload:", error);
+      // URL COMPLETA
+      setImagemPreview(`http://localhost:3001${data.imagem_url}`);
+    } catch (err) {
+      console.error(err);
     }
   };
+
 
 
   return (

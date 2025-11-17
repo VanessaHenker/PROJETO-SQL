@@ -49,7 +49,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
     onSubmit(formData, produtoEditando?.produto_id);
   };
 
-
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -74,8 +73,6 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       console.error(err);
     }
   };
-
-
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>

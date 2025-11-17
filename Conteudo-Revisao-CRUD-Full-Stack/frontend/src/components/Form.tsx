@@ -49,10 +49,34 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
     onSubmit(formData, produtoEditando?.produto_id);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setImagemPreview(file ? URL.createObjectURL(file) : null);
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // preview local
+    setImagemPreview(URL.createObjectURL(file));
+
+    // envia para o servidor
+    const formData = new FormData();
+    formData.append("imagem", file);
+
+    try {
+      const response = await fetch("http://localhost:3001/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Erro ao enviar imagem");
+
+      const data = await response.json();
+
+      // salva URL real gerada pelo servidor
+      setImagemPreview(data.imagem_url);
+    } catch (error) {
+      console.error("Erro no upload:", error);
+    }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>

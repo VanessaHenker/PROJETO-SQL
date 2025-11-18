@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { db } from "../database/conexaoSQL.js";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import fs from "fs/promises";
+import path from "path";
+
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
 // Interface representando um produto no banco
 interface Produto extends RowDataPacket {
@@ -16,10 +20,12 @@ interface Produto extends RowDataPacket {
 // ==================== LISTAR PRODUTOS ====================
 export const listarProdutos = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const [rows] = await db.query<Produto[]>("SELECT * FROM produtos ORDER BY produto_id DESC");
+    const [rows] = await db.query<Produto[]>(
+      "SELECT * FROM produtos ORDER BY produto_id DESC"
+    );
     res.json(rows);
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao listar produtos:", err);
     res.status(500).json({ error: "Erro ao buscar produtos" });
   }
 };
@@ -28,7 +34,10 @@ export const listarProdutos = async (_req: Request, res: Response): Promise<void
 export const obterProduto = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const [rows] = await db.query<Produto[]>("SELECT * FROM produtos WHERE produto_id = ?", [id]);
+    const [rows] = await db.query<Produto[]>(
+      "SELECT * FROM produtos WHERE produto_id = ?",
+      [id]
+    );
 
     if (rows.length === 0) {
       res.status(404).json({ error: "Produto não encontrado" });
@@ -37,7 +46,7 @@ export const obterProduto = async (req: Request, res: Response): Promise<void> =
 
     res.json(rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao obter produto:", err);
     res.status(500).json({ error: "Erro ao buscar produto" });
   }
 };
@@ -79,7 +88,7 @@ export const criarProduto = async (req: Request, res: Response): Promise<void> =
 
     res.status(201).json(novoProduto[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao criar produto:", err);
     res.status(500).json({ error: "Erro ao criar produto" });
   }
 };
@@ -90,7 +99,6 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
     const { id } = req.params;
     const { nome, descricao, preco, quantidade_estoque, imagem_url } = req.body;
 
-    // Atualiza o produto
     const [result] = await db.execute<ResultSetHeader>(
       `UPDATE produtos 
        SET nome = ?, descricao = ?, preco = ?, quantidade_estoque = ?, imagem_url = ?
@@ -103,37 +111,56 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Busca o produto atualizado
     const [rows] = await db.query<Produto[]>(
       "SELECT * FROM produtos WHERE produto_id = ?",
       [id]
     );
 
-    res.json(rows[0]); // ✅ retorna o produto completo
+    res.json(rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao atualizar produto:", err);
     res.status(500).json({ error: "Erro ao atualizar produto" });
   }
 };
 
-// ==================== DELETAR PRODUTO ====================
+// ==================== DELETAR PRODUTO (com exclusão da imagem) ====================
 export const deletarProduto = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
+    // 1️⃣ Busca o produto para pegar a imagem
+    const [rows] = await db.query<Produto[]>(
+      "SELECT imagem_url FROM produtos WHERE produto_id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+      return;
+    }
+
+    const imagemUrl = rows[0].imagem_url;
+
+    // 2️⃣ Deleta o produto do banco
     const [result] = await db.execute<ResultSetHeader>(
       "DELETE FROM produtos WHERE produto_id = ?",
       [id]
     );
 
-    if (result.affectedRows === 0) {
-      res.status(404).json({ error: "Produto não encontrado" });
-      return;
+    if (imagemUrl) {
+      const arquivo = path.join(UPLOADS_DIR, path.basename(imagemUrl));
+      try {
+        await fs.unlink(arquivo);
+        console.log(`🗑 Arquivo removido: ${arquivo}`);
+      } catch (err) {
+        // Apenas log, não falha se o arquivo não existir
+        console.warn(`⚠ Não foi possível remover arquivo ${arquivo}:`, (err as Error).message);
+      }
     }
 
-    res.json({ message: "Produto excluído com sucesso" });
+    res.json({ message: "Produto e imagem excluídos com sucesso" });
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao deletar produto:", err);
     res.status(500).json({ error: "Erro ao deletar produto" });
   }
 };

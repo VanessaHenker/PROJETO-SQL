@@ -15,13 +15,18 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [imagemOriginal, setImagemOriginal] = useState<string | null>(null);
 
+  // ================= CARREGAR CAMPOS NA EDIÇÃO =================
   useEffect(() => {
     if (produtoEditando) {
       setNome(produtoEditando.nome ?? "");
       setDescricao(produtoEditando.descricao ?? "");
       setPreco(produtoEditando.preco?.toString() ?? "");
       setQuantidade(produtoEditando.quantidade_estoque?.toString() ?? "");
+
+      // mantém a imagem original do banco
+      setImagemOriginal(produtoEditando.imagem_url ?? null);
       setImagemPreview(produtoEditando.imagem_url ?? null);
     } else {
       setNome("");
@@ -29,9 +34,11 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       setPreco("");
       setQuantidade("");
       setImagemPreview(null);
+      setImagemOriginal(null);
     }
   }, [produtoEditando]);
 
+  // ================= ENVIO DO FORM =================
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -42,18 +49,19 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: imagemPreview ?? "",
+      imagem_url: imagemPreview ?? imagemOriginal ?? "",
       data_cadastro: produtoEditando?.data_cadastro ?? agora,
     };
 
     onSubmit(formData, produtoEditando?.produto_id);
   };
 
+  // ================= UPLOAD DE IMAGEM =================
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // preview local imediato
+    // preview local
     setImagemPreview(URL.createObjectURL(file));
 
     const formData = new FormData();
@@ -64,14 +72,14 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
         method: "POST",
         body: formData,
       });
-
-
-
       
       const data = await response.json();
 
-      // URL COMPLETA
-      setImagemPreview(`http://localhost:3001${data.imagem_url}`);
+      // grava URL real
+      const urlFinal = `http://localhost:3001${data.imagem_url}`;
+      setImagemPreview(urlFinal);
+      setImagemOriginal(urlFinal);
+
     } catch (err) {
       console.error(err);
     }

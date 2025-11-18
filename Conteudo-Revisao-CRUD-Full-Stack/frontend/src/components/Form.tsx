@@ -65,6 +65,9 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
         body: formData,
       });
 
+
+
+      
       const data = await response.json();
 
       // URL COMPLETA

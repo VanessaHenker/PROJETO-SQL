@@ -5,12 +5,8 @@ import Grid from "./components/Grid";
 import type { Produto } from "./types/typesSQL";
 import styles from "./styles/app.module.css";
 
-interface ProdutoComLoading extends Produto {
-  isDeleting?: boolean; // controle do loading ao deletar
-}
-
 const App: React.FC = () => {
-  const [produtos, setProdutos] = useState<ProdutoComLoading[]>([]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produtoEditando, setProdutoEditando] = useState<Produto | null>(null);
 
   // ================= BUSCAR PRODUTOS =================
@@ -33,16 +29,18 @@ const App: React.FC = () => {
   const handleSubmit = async (formData: ProdutoFormData, produtoId?: number) => {
     try {
       if (produtoId) {
-        // UPDATE
+        // UPDATE real no MySQL via backend
         const res = await fetch(`http://localhost:3001/produtos/${produtoId}`, {
-          method: "PUT",
+          method: "PUT", // usar PUT para MySQL real
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
+
         if (!res.ok) throw new Error("Erro ao atualizar produto");
 
         const produtoAtualizado: Produto = await res.json();
 
+        // Atualiza o estado do grid
         setProdutos((prev) =>
           prev.map((p) =>
             p.produto_id === produtoAtualizado.produto_id ? produtoAtualizado : p
@@ -67,21 +65,11 @@ const App: React.FC = () => {
     }
   };
 
+
   // ================= EXCLUIR PRODUTO =================
-  const deleteProduto = async (produto: ProdutoComLoading) => {
-    if (!confirm(`Deseja realmente excluir o produto "${produto.nome}"?`)) return;
-
-    // Marca como deletando para desabilitar o botão
-    setProdutos((prev) =>
-      prev.map((p) =>
-        p.produto_id === produto.produto_id ? { ...p, isDeleting: true } : p
-      )
-    );
-
+  const deleteProduto = async (produto: Produto) => {
     try {
-      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`http://localhost:3001/produtos/${produto.produto_id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Erro ao excluir produto");
 
       setProdutos((prev) =>
@@ -89,13 +77,6 @@ const App: React.FC = () => {
       );
     } catch (err) {
       console.error(err);
-      alert("Erro ao excluir produto");
-      // Remove flag de deletando
-      setProdutos((prev) =>
-        prev.map((p) =>
-          p.produto_id === produto.produto_id ? { ...p, isDeleting: false } : p
-        )
-      );
     }
   };
 
@@ -116,11 +97,7 @@ const App: React.FC = () => {
 
       <div className={styles.container}>
         <h2 className={styles.subtitle}>Lista de Produtos</h2>
-        <Grid
-          produtos={produtos}
-          onDelete={deleteProduto}
-          onEdit={handleEdit}
-        />
+        <Grid produtos={produtos} onDelete={deleteProduto} onEdit={handleEdit} />
       </div>
     </div>
   );

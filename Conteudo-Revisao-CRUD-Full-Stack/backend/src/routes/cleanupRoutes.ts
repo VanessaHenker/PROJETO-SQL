@@ -3,9 +3,10 @@ import { limparArquivosOrfaos } from "../utils/cleanupUploads.js";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
+// Rota manual para rodar limpeza
+router.get("/limpar", async (_req, res) => {
   await limparArquivosOrfaos();
-  res.json({ message: "Limpeza executada! Veja o terminal." });
+  res.json({ status: "Limpeza executada" });
 });
 
 export default router;

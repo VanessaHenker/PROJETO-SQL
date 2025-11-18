@@ -4,6 +4,7 @@ import path from "path";
 
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";;
+import { limparArquivosOrfaos } from "./utils/cleanupUploads.js";
 
 const app = express();
 
@@ -25,3 +26,4 @@ app.get("/", (_req, res) => {
 // Porta
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`🚀 Servidor rodando em http://localhost:${PORT}`));
+limparArquivosOrfaos();

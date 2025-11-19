@@ -120,7 +120,7 @@ export const deletarProduto = async (req: Request, res: Response): Promise<void>
   try {
     const { id } = req.params;
 
-    // 🔍 1) Buscar a imagem antes de deletar
+    // 🔍 1) Buscar a imagem do produto antes de deletar
     const [rows] = await db.query<Produto[]>(
       "SELECT imagem_url FROM produtos WHERE produto_id = ?",
       [id]
@@ -144,18 +144,30 @@ export const deletarProduto = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // 🧹 3) Remover imagem da pasta uploads
+    // 🧹 3) Remover imagem do produto deletado
     if (imagem_url) {
       const filename = path.basename(imagem_url);
       const imgPath = path.join(UPLOADS_DIR, filename);
-
       if (fs.existsSync(imgPath)) {
         fs.unlinkSync(imgPath);
         console.log("🗑️ Arquivo removido:", filename);
       }
     }
 
-    res.json({ message: "Produto e imagem removidos com sucesso" });
+    // 🔄 4) Limpar arquivos órfãos
+    const [produtosAtuais] = await db.query<Produto[]>("SELECT imagem_url FROM produtos");
+    const imagensValidas = new Set(produtosAtuais.map(p => p.imagem_url).filter(Boolean));
+
+    const arquivos = fs.readdirSync(UPLOADS_DIR);
+    arquivos.forEach((arquivo) => {
+      const caminho = path.join(UPLOADS_DIR, arquivo);
+      if (!imagensValidas.has(`/uploads/${arquivo}`)) {
+        fs.unlinkSync(caminho);
+        console.log("🗑️ Arquivo órfão removido:", arquivo);
+      }
+    });
+
+    res.json({ message: "Produto e imagens órfãs removidos com sucesso" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });

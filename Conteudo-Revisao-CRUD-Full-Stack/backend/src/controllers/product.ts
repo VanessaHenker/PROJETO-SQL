@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { db } from "../database/conexaoSQL.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
+import fs from "fs";
+import path from "path";
 
 // Interface representando um produto no banco
 interface Produto extends RowDataPacket {
@@ -12,6 +14,8 @@ interface Produto extends RowDataPacket {
   data_cadastro: Date;
   imagem_url: string | null;
 }
+
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
 // ==================== LISTAR PRODUTOS ====================
 export const listarProdutos = async (_req: Request, res: Response): Promise<void> => {
@@ -90,7 +94,6 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
     const { id } = req.params;
     const { nome, descricao, preco, quantidade_estoque, imagem_url } = req.body;
 
-    // Atualiza o produto
     const [result] = await db.execute<ResultSetHeader>(
       `UPDATE produtos 
        SET nome = ?, descricao = ?, preco = ?, quantidade_estoque = ?, imagem_url = ?
@@ -103,24 +106,34 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Busca o produto atualizado
-    const [rows] = await db.query<Produto[]>(
-      "SELECT * FROM produtos WHERE produto_id = ?",
-      [id]
-    );
+    const [rows] = await db.query<Produto[]>(`SELECT * FROM produtos WHERE produto_id = ?`, [id]);
 
-    res.json(rows[0]); // ✅ retorna o produto completo
+    res.json(rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao atualizar produto" });
   }
 };
 
-// ==================== DELETAR PRODUTO ====================
+// ==================== DELETAR PRODUTO (ALTERADO) ====================
 export const deletarProduto = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
+    // 🔍 1) Buscar a imagem antes de deletar
+    const [rows] = await db.query<Produto[]>(
+      "SELECT imagem_url FROM produtos WHERE produto_id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+      return;
+    }
+
+    const imagem_url = rows[0].imagem_url;
+
+    // 🗑️ 2) Deletar o produto do banco
     const [result] = await db.execute<ResultSetHeader>(
       "DELETE FROM produtos WHERE produto_id = ?",
       [id]
@@ -131,7 +144,18 @@ export const deletarProduto = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    res.json({ message: "Produto excluído com sucesso" });
+    // 🧹 3) Remover imagem da pasta uploads
+    if (imagem_url) {
+      const filename = path.basename(imagem_url);
+      const imgPath = path.join(UPLOADS_DIR, filename);
+
+      if (fs.existsSync(imgPath)) {
+        fs.unlinkSync(imgPath);
+        console.log("🗑️ Arquivo removido:", filename);
+      }
+    }
+
+    res.json({ message: "Produto e imagem removidos com sucesso" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });

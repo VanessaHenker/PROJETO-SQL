@@ -15,6 +15,7 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
   const [preco, setPreco] = useState<string>("");
   const [quantidade, setQuantidade] = useState<string>("");
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  const [arquivo, setArquivo] = useState<File | null>(null);
 
   useEffect(() => {
     if (produtoEditando) {
@@ -32,8 +33,24 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
     }
   }, [produtoEditando]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    let imagem_url = produtoEditando?.imagem_url ?? "";
+
+    // SE tiver imagem nova → envia agora
+    if (arquivo) {
+      const fd = new FormData();
+      fd.append("imagem", arquivo);
+
+      const uploadRes = await fetch("http://localhost:3001/upload", {
+        method: "POST",
+        body: fd,
+      });
+
+      const uploadData = await uploadRes.json();
+      imagem_url = `http://localhost:3001${uploadData.imagem_url}`;
+    }
 
     const agora = new Date().toISOString();
 
@@ -42,39 +59,23 @@ const Form: React.FC<FormProps> = ({ onSubmit, produtoEditando }) => {
       descricao,
       preco: preco === "" ? 0 : Number(preco),
       quantidade_estoque: quantidade === "" ? 0 : Number(quantidade),
-      imagem_url: imagemPreview ?? "",
+      imagem_url,
       data_cadastro: produtoEditando?.data_cadastro ?? agora,
     };
 
-    onSubmit(formData, produtoEditando?.produto_id);
+    await onSubmit(formData, produtoEditando?.produto_id);
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // preview local imediato
+    // preview imediato
     setImagemPreview(URL.createObjectURL(file));
 
-    const formData = new FormData();
-    formData.append("imagem", file);
-
-    try {
-      const response = await fetch("http://localhost:3001/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-
-
-      
-      const data = await response.json();
-
-      // URL COMPLETA
-      setImagemPreview(`http://localhost:3001${data.imagem_url}`);
-    } catch (err) {
-      console.error(err);
-    }
+    // guardar o arquivo para enviar SOMENTE no submit
+    setArquivo(file);
   };
 
   return (

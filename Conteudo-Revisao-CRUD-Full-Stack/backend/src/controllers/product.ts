@@ -121,6 +121,29 @@ export const deletarProduto = async (req: Request, res: Response): Promise<void>
   try {
     const { id } = req.params;
 
+    // 1. Buscar o produto antes de deletar
+    const [rows] = await db.query<Produto[]>(
+      "SELECT imagem_url FROM produtos WHERE produto_id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+      return;
+    }
+
+    const imagemDoBanco = rows[0].imagem_url;
+
+    // 2. Se tiver imagem, deletar da pasta uploads
+    if (imagemDoBanco) {
+      const caminho = path.join(process.cwd(), "uploads", imagemDoBanco);
+
+      if (fs.existsSync(caminho)) {
+        fs.unlinkSync(caminho); // remove a imagem
+      }
+    }
+
+    // 3. Excluir o produto do banco
     const [result] = await db.execute<ResultSetHeader>(
       "DELETE FROM produtos WHERE produto_id = ?",
       [id]
@@ -131,7 +154,7 @@ export const deletarProduto = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    res.json({ message: "Produto excluído com sucesso" });
+    res.json({ message: "Produto excluído e imagem removida." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { db } from "../database/conexaoSQL.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
+import fs from "fs";
+import path from "path";
 
 // Interface representando um produto no banco
 interface Produto extends RowDataPacket {

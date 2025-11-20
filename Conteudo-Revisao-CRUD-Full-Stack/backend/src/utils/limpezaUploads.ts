@@ -1,30 +1,45 @@
 import fs from "fs";
 import path from "path";
-import { db } from "../database/conexaoSQL.js";
+import connection from "../config/database.js";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
-export const limparUploadsOrfaos = async () => {
+export const limparUploads = async (req, res) => {
   try {
-    // Buscar imagens do banco
-    const [rows] = await db.query<any[]>("SELECT imagem_url FROM produtos");
+    // 1. Buscar todas as URLs no banco
+    const [rows] = await connection.query(
+      "SELECT imagem_url FROM produtos"
+    );
 
-    const imagensNoBanco = rows
-      .map((r) => r.imagem_url?.replace("/uploads/", "")) // remove prefixo
+    // 2. Extrair apenas o nome dos arquivos
+    const imagensBanco = rows
+      .map(row => row.imagem_url?.split("/").pop())
       .filter(Boolean);
 
-    // Listar arquivos da pasta
-    const arquivos = fs.readdirSync(UPLOADS_DIR);
+    // 3. Listar arquivos da pasta uploads
+    const arquivosPasta = fs.readdirSync(UPLOADS_DIR);
 
-    arquivos.forEach((arquivo) => {
-      if (!imagensNoBanco.includes(arquivo)) {
+    let removidos = [];
+
+    // 4. Remover arquivos sem referência no banco
+    arquivosPasta.forEach(arquivo => {
+      if (!imagensBanco.includes(arquivo)) {
         fs.unlinkSync(path.join(UPLOADS_DIR, arquivo));
-        console.log("🗑 Removido arquivo órfão:", arquivo);
+        removidos.push(arquivo);
       }
     });
 
-    console.log("✔ Limpeza de uploads concluída com sucesso");
-  } catch (err) {
-    console.error("Erro na limpeza de uploads:", err);
+    res.json({
+      ok: true,
+      mensagem: "Limpeza concluída",
+      arquivos_excluidos: removidos,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      erro: "Erro ao limpar uploads",
+    });
   }
 };

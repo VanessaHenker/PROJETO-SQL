@@ -118,47 +118,37 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ==================== DELETAR PRODUTO ====================
-export const deletarProduto = async (req: Request, res: Response): Promise<void> => {
+// ========== DELETAR + REMOVER IMAGEM ==========
+export const deletarProduto = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // 1. Buscar o produto antes de deletar
+    // Buscar imagem antes de deletar
     const [rows] = await db.query<Produto[]>(
       "SELECT imagem_url FROM produtos WHERE produto_id = ?",
       [id]
     );
 
-    if (rows.length === 0) {
-      res.status(404).json({ error: "Produto não encontrado" });
-      return;
-    }
+    if (rows.length === 0)
+      return res.status(404).json({ error: "Produto não encontrado" });
 
-    const imagemDoBanco = rows[0].imagem_url;
+    const img = rows[0].imagem_url;
 
-    // 2. Se tiver imagem, deletar da pasta uploads
-    if (imagemDoBanco) {
-      const caminho = path.join(process.cwd(), "uploads", imagemDoBanco);
+    // Remover da pasta uploads
+    if (img) {
+      const nomeArquivo = img.replace("/uploads/", "");
+      const caminho = path.join(process.cwd(), "uploads", nomeArquivo);
 
       if (fs.existsSync(caminho)) {
-        fs.unlinkSync(caminho); // remove a imagem
+        fs.unlinkSync(caminho);
       }
     }
 
-    // 3. Excluir o produto do banco
-    const [result] = await db.execute<ResultSetHeader>(
-      "DELETE FROM produtos WHERE produto_id = ?",
-      [id]
-    );
-
-    if (result.affectedRows === 0) {
-      res.status(404).json({ error: "Produto não encontrado" });
-      return;
-    }
+    // Deletar do DB
+    await db.execute("DELETE FROM produtos WHERE produto_id = ?", [id]);
 
     res.json({ message: "Produto excluído e imagem removida." });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });
   }
 };

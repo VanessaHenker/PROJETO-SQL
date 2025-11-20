@@ -136,4 +136,4 @@ export const deletarProduto = async (req: Request, res: Response): Promise<void>
     console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });
   }
-};
+}

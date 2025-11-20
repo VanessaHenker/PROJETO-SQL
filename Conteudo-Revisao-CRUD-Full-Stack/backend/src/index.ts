@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 
@@ -10,11 +11,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Caminho absoluto da pasta uploads
-const uploadsPath = path.join(process.cwd(), "uploads");
-
-// Servir arquivos estáticos da pasta uploads
-app.use("/uploads", express.static(uploadsPath));
+// Servir imagens
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Rotas principais
 app.use("/produtos", productRoutes);
@@ -25,8 +23,8 @@ app.get("/", (_req, res) => {
   res.send("API rodando corretamente! 🚀");
 });
 
-// Porta do servidor
+// Porta
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando corretamente: http://localhost:${PORT}`);
-});
+app.listen(PORT, () =>
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`)
+);

@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../database/conexaoSQL.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import fs from "fs";
-import path from "path";
 
 // Interface representando um produto no banco
 interface Produto extends RowDataPacket {
@@ -118,37 +116,24 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ========== DELETAR + REMOVER IMAGEM ==========
-export const deletarProduto = async (req: Request, res: Response) => {
+// ==================== DELETAR PRODUTO ====================
+export const deletarProduto = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
-    // Buscar imagem antes de deletar
-    const [rows] = await db.query<Produto[]>(
-      "SELECT imagem_url FROM produtos WHERE produto_id = ?",
+    const [result] = await db.execute<ResultSetHeader>(
+      "DELETE FROM produtos WHERE produto_id = ?",
       [id]
     );
 
-    if (rows.length === 0)
-      return res.status(404).json({ error: "Produto não encontrado" });
-
-    const img = rows[0].imagem_url;
-
-    // Remover da pasta uploads
-    if (img) {
-      const nomeArquivo = img.replace("/uploads/", "");
-      const caminho = path.join(process.cwd(), "uploads", nomeArquivo);
-
-      if (fs.existsSync(caminho)) {
-        fs.unlinkSync(caminho);
-      }
+    if (result.affectedRows === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+      return;
     }
 
-    // Deletar do DB
-    await db.execute("DELETE FROM produtos WHERE produto_id = ?", [id]);
-
-    res.json({ message: "Produto excluído e imagem removida." });
+    res.json({ message: "Produto excluído com sucesso" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });
   }
 };

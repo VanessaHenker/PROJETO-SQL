@@ -1,37 +1,44 @@
 import fs from "fs";
 import path from "path";
 import { db } from "../database/conexaoSQL.js";
+import { RowDataPacket } from "mysql2";
 
-// Pasta onde ficam as imagens
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
-export const limparImagensOrfas = async (): Promise<string[]> => {
+// Tipagem correta das linhas retornadas
+interface ProdutoRow extends RowDataPacket {
+  imagem_url: string | null;
+}
+
+export async function cleanupUploads() {
   try {
-    // 1️⃣ Pegando todas as imagens da pasta
-    const arquivosPasta = fs.readdirSync(UPLOADS_DIR);
-
-    // 2️⃣ Pegando todas as imagens do banco
-    const [rows] = await db.query("SELECT imagem_url FROM produtos");
-    const imagensBanco = rows
-      .map((row: any) => row.imagem_url)
-      .filter((img: string | null) => img !== null)
-      .map((img: string) => img.replace("/uploads/", "")); // deixa só o nome do arquivo
-
-    // 3️⃣ Filtrar as que NÃO estão no banco
-    const imagensOrfas = arquivosPasta.filter(
-      (arquivo) => !imagensBanco.includes(arquivo)
+    // 1. Buscar todas as imagens do banco
+    const [rows] = await db.query<ProdutoRow[]>(
+      "SELECT imagem_url FROM produtos WHERE imagem_url IS NOT NULL"
     );
 
-    // 4️⃣ Excluir arquivos órfãos
-    imagensOrfas.forEach((arquivo) => {
-      const caminho = path.join(UPLOADS_DIR, arquivo);
-      fs.unlinkSync(caminho);
-      console.log(`🗑️ Imagem removida: ${arquivo}`);
+    // Agora sim, rows é um array e tem .map()
+    const imagensNoBanco = rows.map((r) => {
+      if (!r.imagem_url) return null;
+
+      return r.imagem_url.replace("http://localhost:3001", "");
+    }).filter(Boolean);
+
+    // 2. Listar todos os arquivos da pasta uploads
+    const arquivosUploads = fs.readdirSync(UPLOADS_DIR);
+
+    // 3. Verificar arquivos órfãos
+    arquivosUploads.forEach((arquivo) => {
+      const caminhoBanco = `/uploads/${arquivo}`;
+
+      if (!imagensNoBanco.includes(caminhoBanco)) {
+        console.log(`🧹 Apagando imagem órfã: ${arquivo}`);
+        fs.unlinkSync(path.join(UPLOADS_DIR, arquivo));
+      }
     });
 
-    return imagensOrfas;
+    console.log("✨ Limpeza de imagens órfãs concluída!");
   } catch (err) {
-    console.error("Erro ao limpar uploads:", err);
-    return [];
+    console.error("Erro na limpeza de uploads:", err);
   }
-};
+}

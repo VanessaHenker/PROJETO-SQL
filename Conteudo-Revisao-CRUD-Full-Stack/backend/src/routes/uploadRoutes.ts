@@ -1,21 +1,44 @@
-import { Router, Request, Response } from "express";
-import upload from "../middleware/upload.js";
-import { cleanupUploads } from "../utils/cleanupUploads.js";
+import { Router } from "express";
+import path from "path";
+import fs from "fs";
 
 const router = Router();
 
-router.post("/", upload.single("imagem"), (req: Request, res: Response) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "Nenhum arquivo enviado" });
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
+
+// GET → limpar arquivos órfãos
+router.get("/limpar", (req, res) => {
+  try {
+    const arquivosNaPasta = fs.readdirSync(UPLOADS_DIR);
+    const produtosJsonPath = path.join(process.cwd(), "database", "produtos.json");
+
+    if (!fs.existsSync(produtosJsonPath)) {
+      return res.status(500).json({ erro: "Arquivo produtos.json não encontrado" });
+    }
+
+    const produtos = JSON.parse(fs.readFileSync(produtosJsonPath, "utf8"));
+
+    const imagensNoBanco = produtos.map((p: any) => p.imagem).filter(Boolean);
+
+    const removidos: string[] = [];
+
+    for (const arquivo of arquivosNaPasta) {
+      if (!imagensNoBanco.includes(arquivo)) {
+        const caminhoCompleto = path.join(UPLOADS_DIR, arquivo);
+        fs.unlinkSync(caminhoCompleto);
+        removidos.push(arquivo);
+      }
+    }
+
+    return res.json({
+      mensagem: "Arquivos órfãos removidos com sucesso!",
+      removidos,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ erro: "Erro ao limpar arquivos" });
   }
-
-  res.json({ imagem_url: `/uploads/${req.file.filename}` });
-});
-
-// Rota para limpar imagens órfãs
-router.get("/limpar", async (_req: Request, res: Response) => {
-  await cleanupUploads();
-  res.json({ message: "Limpeza concluída!" });
 });
 
 export default router;

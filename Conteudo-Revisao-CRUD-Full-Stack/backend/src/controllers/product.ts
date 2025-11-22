@@ -1,10 +1,22 @@
 import { Request, Response } from "express";
 import { db } from "../database/conexaoSQL.js";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 
-// Listar produtos
-export const listarProdutos = async (_req: Request, res: Response) => {
+// Interface representando um produto no banco
+interface Produto extends RowDataPacket {
+  produto_id: number;
+  nome: string;
+  descricao: string;
+  preco: number;
+  quantidade_estoque: number;
+  data_cadastro: Date;
+  imagem_url: string | null;
+}
+
+// ==================== LISTAR PRODUTOS ====================
+export const listarProdutos = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const [rows] = await db.query("SELECT * FROM produtos");
+    const [rows] = await db.query<Produto[]>("SELECT * FROM produtos ORDER BY produto_id DESC");
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -12,96 +24,114 @@ export const listarProdutos = async (_req: Request, res: Response) => {
   }
 };
 
-// Obter produto por ID
-export const obterProduto = async (req: Request, res: Response) => {
+// ==================== OBTER PRODUTO ====================
+export const obterProduto = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+    const { id } = req.params;
+    const [rows] = await db.query<Produto[]>("SELECT * FROM produtos WHERE produto_id = ?", [id]);
 
-    const [rows] = await db.query("SELECT * FROM produtos WHERE produto_id = ?", [id]);
-    const produto = (rows as any[])[0] ?? null;
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+      return;
+    }
 
-    if (!produto) return res.status(404).json({ error: "Produto não encontrado" });
-
-    res.json(produto);
+    res.json(rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao buscar produto" });
   }
 };
 
-// Criar produto
-export const criarProduto = async (req: Request, res: Response) => {
+// ==================== CRIAR PRODUTO ====================
+export const criarProduto = async (req: Request, res: Response): Promise<void> => {
   try {
     const {
       nome,
       descricao = "",
       preco = 0,
       quantidade_estoque = 0,
-      data_cadastro = new Date().toISOString().slice(0, 10),
-      imagem_url = null
+      imagem_url = null,
+      data_cadastro,
     } = req.body;
 
-    if (!nome) return res.status(400).json({ error: "O nome do produto é obrigatório" });
+    if (!nome) {
+      res.status(400).json({ error: "O nome do produto é obrigatório" });
+      return;
+    }
 
-    const [result] = await db.execute(
+    const dataFormatada = data_cadastro
+      ? new Date(data_cadastro).toISOString().slice(0, 19).replace("T", " ")
+      : new Date().toISOString().slice(0, 19).replace("T", " ");
+
+    const [result] = await db.execute<ResultSetHeader>(
       `INSERT INTO produtos 
-       (nome, descricao, preco, quantidade_estoque, data_cadastro, imagem_url) 
+       (nome, descricao, preco, quantidade_estoque, data_cadastro, imagem_url)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [nome, descricao, preco, quantidade_estoque, data_cadastro, imagem_url]
+      [nome, descricao, preco, quantidade_estoque, dataFormatada, imagem_url]
     );
 
-    const insertId = (result as any).insertId;
-    const [rows] = await db.query("SELECT * FROM produtos WHERE produto_id = ?", [insertId]);
-    res.status(201).json((rows as any[])[0]);
+    const insertId = result.insertId;
+
+    const [novoProduto] = await db.query<Produto[]>(
+      "SELECT * FROM produtos WHERE produto_id = ?",
+      [insertId]
+    );
+
+    res.status(201).json(novoProduto[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao criar produto" });
   }
 };
 
-// Atualizar produto
-export const atualizarProduto = async (req: Request, res: Response) => {
+// ==================== ATUALIZAR PRODUTO ====================
+export const atualizarProduto = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+    const { id } = req.params;
+    const { nome, descricao, preco, quantidade_estoque, imagem_url } = req.body;
 
-    const {
-      nome,
-      descricao = "",
-      preco = 0,
-      quantidade_estoque = 0,
-      data_cadastro = new Date().toISOString().slice(0, 10),
-      imagem_url = null
-    } = req.body;
-
-    await db.execute(
+    // Atualiza o produto
+    const [result] = await db.execute<ResultSetHeader>(
       `UPDATE produtos 
-       SET nome = ?, descricao = ?, preco = ?, quantidade_estoque = ?, data_cadastro = ?, imagem_url = ? 
+       SET nome = ?, descricao = ?, preco = ?, quantidade_estoque = ?, imagem_url = ?
        WHERE produto_id = ?`,
-      [nome, descricao, preco, quantidade_estoque, data_cadastro, imagem_url, id]
+      [nome, descricao, preco, quantidade_estoque, imagem_url, id]
     );
 
-    const [rows] = await db.query("SELECT * FROM produtos WHERE produto_id = ?", [id]);
-    const produtoAtualizado = (rows as any[])[0];
+    if (result.affectedRows === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+      return;
+    }
 
-    if (!produtoAtualizado) return res.status(404).json({ error: "Produto não encontrado" });
+    // Busca o produto atualizado
+    const [rows] = await db.query<Produto[]>(
+      "SELECT * FROM produtos WHERE produto_id = ?",
+      [id]
+    );
 
-    res.json(produtoAtualizado);
+    res.json(rows[0]); // ✅ retorna o produto completo
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao atualizar produto" });
   }
 };
 
-// Deletar produto
-export const deletarProduto = async (req: Request, res: Response) => {
+// ==================== DELETAR PRODUTO ====================
+export const deletarProduto = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+    const { id } = req.params;
 
-    await db.execute("DELETE FROM produtos WHERE produto_id = ?", [id]);
-    res.status(204).send();
+    const [result] = await db.execute<ResultSetHeader>(
+      "DELETE FROM produtos WHERE produto_id = ?",
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+      return;
+    }
+
+    res.json({ message: "Produto excluído com sucesso" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });

@@ -2,8 +2,7 @@
 import { Request, Response } from "express";
 import { db } from "../database/conexaoSQL.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { extractFileName } from "../utils/deleteImage.js";
-
+import { extractFileName, deleteImage } from "../utils/deleteImage.js";
 
 
 // Interface representando um produto no banco

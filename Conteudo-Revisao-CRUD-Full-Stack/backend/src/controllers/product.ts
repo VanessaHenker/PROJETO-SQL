@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../database/conexaoSQL.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { deleteImage } from "../utils/deleteImage.js";
 
 // Interface representando um produto no banco
 interface Produto extends RowDataPacket {
@@ -117,21 +118,44 @@ export const atualizarProduto = async (req: Request, res: Response): Promise<voi
 };
 
 // ==================== DELETAR PRODUTO ====================
-export const deletarProduto = async (req: Request, res: Response): Promise<void> => {
+export const deletarProduto = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [result] = await db.execute<ResultSetHeader>(
+    // 1️⃣ Buscar o produto para pegar a imagem antes de excluir
+    const [rows] = await db.query(
+      "SELECT imagem_url FROM produtos WHERE produto_id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Produto não encontrado" });
+    }
+
+    const fileName = rows[0].imagem_url;
+
+    // 2️⃣ Deletar produto
+    const [result] = await db.execute(
       "DELETE FROM produtos WHERE produto_id = ?",
       [id]
     );
 
     if (result.affectedRows === 0) {
-      res.status(404).json({ error: "Produto não encontrado" });
-      return;
+      return res.status(404).json({ error: "Erro ao excluir produto" });
+    }
+
+    // 3️⃣ Verificar se ainda existe outro produto usando a mesma imagem
+    const [countRows] = await db.query(
+      "SELECT COUNT(*) AS total FROM produtos WHERE imagem_url = ?",
+      [fileName]
+    );
+
+    if (countRows[0].total === 0) {
+      deleteImage(fileName);
     }
 
     res.json({ message: "Produto excluído com sucesso" });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao deletar produto" });

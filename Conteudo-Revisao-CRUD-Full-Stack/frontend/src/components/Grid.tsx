@@ -26,7 +26,6 @@ const DataCadastro: React.FC<{ data_cadastro?: string }> = ({ data_cadastro }) =
 
       const dataOriginal = new Date(dataStr);
 
-      // 🕒 Subtrair 3 horas (corrige fuso UTC -> Brasil)
       const dataCorrigida = new Date(dataOriginal.getTime() - 6 * 60 * 60 * 1000);
 
       const formatado = `${String(dataCorrigida.getDate()).padStart(2, "0")}/${String(
@@ -60,10 +59,15 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
     <div className={styles.grid}>
       {produtos.map((produto) => (
         <div key={produto.produto_id} className={styles.card}>
+          
           {/* Imagem do produto */}
           <div className={styles.imageArea}>
             <img
-              src={produto.imagem_url || "/img/sem-imagem.png"}
+              src={
+                produto.imagem_url
+                  ? `http://localhost:3001/uploads/${produto.imagem_url}`
+                  : "/img/sem-imagem.png"
+              }
               alt={produto.nome || "Produto sem nome"}
               className={styles.image}
               onError={(e) => {
@@ -86,7 +90,7 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
             </span>
           </div>
 
-          {/* Data de cadastro */}
+          {/* Data */}
           <DataCadastro data_cadastro={produto.data_cadastro} />
 
           {/* Botões */}
@@ -99,13 +103,14 @@ const Grid: React.FC<GridProps> = ({ produtos, onDelete, onEdit }) => {
               <FaEdit /> Editar
             </button>
             <button
-              type="button"  
+              type="button"
               className={`${styles.button} ${styles.deleteButton}`}
               onClick={() => onDelete(produto)}
             >
               <FaTrash /> Excluir
             </button>
           </div>
+
         </div>
       ))}
     </div>

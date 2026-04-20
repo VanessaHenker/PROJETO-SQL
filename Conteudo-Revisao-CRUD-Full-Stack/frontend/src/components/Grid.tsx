@@ -24,7 +24,7 @@ const DataCadastro: React.FC<{ data_cadastro?: string }> = ({ data_cadastro }) =
       if (dataStr.includes(" ") && !dataStr.includes("T"))
         dataStr = dataStr.replace(" ", "T");
 
-      const dataOriginal = new Date(dataStr);
+      const dataOriginal = new Date(dataStr); 
 
       const dataCorrigida = new Date(dataOriginal.getTime() - 6 * 60 * 60 * 1000);
 
